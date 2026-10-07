@@ -240,6 +240,8 @@
 
   <script>
 
+<script>
+
 function loadInventoryDashboardContent() {
 
   const container =
@@ -248,21 +250,27 @@ function loadInventoryDashboardContent() {
     );
 
   if (!container) {
+    console.error(
+      'inventoryDashboardContent not found.'
+    );
     return;
   }
 
   fetch(
-    'InventoryDashboardContent.html'
+    './InventoryDashboardContent.html'
   )
-
     .then(function(response) {
 
+      console.log(
+        'Dashboard HTML status:',
+        response.status
+      );
+
       if (!response.ok) {
-
         throw new Error(
-          'Unable to load Inventory Dashboard.'
+          'Dashboard HTML could not be loaded. HTTP ' +
+          response.status
         );
-
       }
 
       return response.text();
@@ -271,98 +279,95 @@ function loadInventoryDashboardContent() {
 
     .then(function(html) {
 
-      container.innerHTML =
-        html;
+      console.log(
+        'Dashboard HTML loaded.'
+      );
 
-      /*
-       * Execute scripts contained in the
-       * loaded dashboard HTML.
-       */
+      container.innerHTML = html;
 
       const scripts =
         container.querySelectorAll(
           'script'
         );
 
+      console.log(
+        'Dashboard scripts found:',
+        scripts.length
+      );
+
       scripts.forEach(function(oldScript) {
 
-  const newScript =
-    document.createElement(
-      'script'
-    );
+        const newScript =
+          document.createElement(
+            'script'
+          );
 
-  if (oldScript.src) {
+        if (oldScript.src) {
 
-    newScript.src =
-      oldScript.src;
+          newScript.src =
+            oldScript.src;
 
-  } else {
+        } else {
 
-    newScript.textContent =
-      oldScript.textContent;
+          newScript.textContent =
+            oldScript.textContent;
 
-  }
+        }
 
-  document.body.appendChild(
-    newScript
+        document.body.appendChild(
+          newScript
+        );
 
-  );
+      });
 
-});
+      setTimeout(function() {
 
+        if (
+          typeof window.loadDashboard ===
+          'function'
+        ) {
 
-// ============================================
-// START INVENTORY DASHBOARD
-// ============================================
+          console.log(
+            'Starting Inventory Dashboard...'
+          );
 
-setTimeout(function() {
+          window.loadDashboard();
 
-  if (
-    typeof loadDashboard ===
-    'function'
-  ) {
+        } else {
 
-    loadDashboard();
+          console.error(
+            'loadDashboard() is NOT available.'
+          );
 
-  } else {
+        }
 
-    console.error(
-      'loadDashboard() was not found.'
-    );
-
-  }
-
-}, 100);
+      }, 500);
 
     })
 
     .catch(function(error) {
 
-      container.innerHTML =
+      console.error(
+        'Dashboard loading error:',
+        error
+      );
 
+      container.innerHTML =
         '<div style="' +
         'padding:20px;' +
         'background:#f8d7da;' +
         'color:#842029;' +
         'border-radius:8px;' +
         '">' +
-
+        '<strong>Inventory Dashboard Error</strong><br><br>' +
         error.message +
-
         '</div>';
 
     });
 
 }
 
-    document.addEventListener(
-  'DOMContentLoaded',
-  function() {
-
-    loadInventoryDashboardContent();
-
-  }
-);
+</script>
     
     function openTab(tabId, button) {
 

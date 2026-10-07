@@ -198,13 +198,11 @@
          INVENTORY DASHBOARD
     ========================= -->
 
-    <div
-      id="inventory"
-      class="tab-content active">
-
-      <?!= include('InventoryDashboardContent'); ?>
-
-    </div>
+   <div id="inventory" class="tab-content active">
+  <div id="inventoryDashboardContent">
+    Loading Inventory Dashboard...
+  </div>
+  </div>
 
 
     <!-- =========================
@@ -242,6 +240,105 @@
 
   <script>
 
+function loadInventoryDashboardContent() {
+
+  const container =
+    document.getElementById(
+      'inventoryDashboardContent'
+    );
+
+  if (!container) {
+    return;
+  }
+
+  fetch(
+    'InventoryDashboardContent.html'
+  )
+
+    .then(function(response) {
+
+      if (!response.ok) {
+
+        throw new Error(
+          'Unable to load Inventory Dashboard.'
+        );
+
+      }
+
+      return response.text();
+
+    })
+
+    .then(function(html) {
+
+      container.innerHTML =
+        html;
+
+      /*
+       * Execute scripts contained in the
+       * loaded dashboard HTML.
+       */
+
+      const scripts =
+        container.querySelectorAll(
+          'script'
+        );
+
+      scripts.forEach(function(oldScript) {
+
+        const newScript =
+          document.createElement(
+            'script'
+          );
+
+        if (oldScript.src) {
+
+          newScript.src =
+            oldScript.src;
+
+        } else {
+
+          newScript.textContent =
+            oldScript.textContent;
+
+        }
+
+        document.body.appendChild(
+          newScript
+        );
+
+      });
+
+    })
+
+    .catch(function(error) {
+
+      container.innerHTML =
+
+        '<div style="' +
+        'padding:20px;' +
+        'background:#f8d7da;' +
+        'color:#842029;' +
+        'border-radius:8px;' +
+        '">' +
+
+        error.message +
+
+        '</div>';
+
+    });
+
+}
+
+    document.addEventListener(
+  'DOMContentLoaded',
+  function() {
+
+    loadInventoryDashboardContent();
+
+  }
+);
+    
     function openTab(tabId, button) {
 
       /* =========================

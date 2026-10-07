@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <base target="_top">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <title>PPE Admin Portal</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      color: #1f2937;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    .header {
+      background: #173f2f;
+      color: white;
+      padding: 20px 25px;
+    }
+
+    .header-title {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .header-subtitle {
+      margin-top: 5px;
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+
+    /* =========================
+       TABS
+    ========================= */
+
+    .tabs {
+      background: white;
+      display: flex;
+      gap: 5px;
+      padding: 10px 20px 0;
+      border-bottom: 1px solid #d9dee3;
+      overflow-x: auto;
+    }
+
+    .tab-button {
+      border: none;
+      background: transparent;
+      padding: 13px 18px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #64748b;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+    }
+
+    .tab-button:hover {
+      color: #173f2f;
+      background: #f5f7f8;
+    }
+
+    .tab-button.active {
+      color: #173f2f;
+      border-bottom: 3px solid #173f2f;
+    }
+
+
+    /* =========================
+       CONTENT
+    ========================= */
+
+    .content {
+      padding: 25px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 700px) {
+
+      .header {
+        padding: 18px;
+      }
+
+      .header-title {
+        font-size: 20px;
+      }
+
+      .content {
+        padding: 15px;
+      }
+
+      .tabs {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .tab-button {
+        padding: 12px 14px;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <!-- =========================
+       HEADER
+  ========================= -->
+
+  <div class="header">
+
+    <div class="header-title">
+      🛡 PPE Management Portal
+    </div>
+
+    <div class="header-subtitle">
+      PPE Inventory, Stock Receipt and Issuance Management
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       TABS
+  ========================= -->
+
+  <div class="tabs">
+
+    <button
+      class="tab-button active"
+      onclick="openTab('inventory', this)">
+
+      📊 Inventory Dashboard
+
+    </button>
+
+
+    <button
+      class="tab-button"
+      onclick="openTab('receipt', this)">
+
+      📥 Stock Receipt
+
+    </button>
+
+
+    <button
+      class="tab-button"
+      onclick="openTab('issuance', this)">
+
+      📤 PPE Issuance
+
+    </button>
+
+  </div>
+
+
+  <!-- =========================
+       MAIN CONTENT
+  ========================= -->
+
+  <div class="content">
+
+
+    <!-- =========================
+         INVENTORY DASHBOARD
+    ========================= -->
+
+    <div
+      id="inventory"
+      class="tab-content active">
+
+      <?!= include('InventoryDashboardContent'); ?>
+
+    </div>
+
+
+    <!-- =========================
+         STOCK RECEIPT
+    ========================= -->
+
+    <div
+      id="receipt"
+      class="tab-content">
+
+      <?!= include('StockReceiptContent'); ?>
+
+    </div>
+
+
+    <!-- =========================
+         PPE ISSUANCE
+    ========================= -->
+
+    <div
+      id="issuance"
+      class="tab-content">
+
+      <?!= include('IssuanceContent'); ?>
+
+    </div>
+
+
+  </div>
+
+
+  <!-- =========================
+       ADMIN PORTAL SCRIPT
+  ========================= -->
+
+  <script>
+
+    function openTab(tabId, button) {
+
+      /* =========================
+         HIDE ALL TABS
+      ========================= */
+
+      const contents =
+        document.querySelectorAll(
+          '.tab-content'
+        );
+
+      contents.forEach(
+        function(content) {
+
+          content.classList.remove(
+            'active'
+          );
+
+        }
+      );
+
+
+      /* =========================
+         REMOVE ACTIVE BUTTONS
+      ========================= */
+
+      const buttons =
+        document.querySelectorAll(
+          '.tab-button'
+        );
+
+      buttons.forEach(
+        function(btn) {
+
+          btn.classList.remove(
+            'active'
+          );
+
+        }
+      );
+
+
+      /* =========================
+         SHOW SELECTED TAB
+      ========================= */
+
+      const selectedTab =
+        document.getElementById(tabId);
+
+      if (selectedTab) {
+
+        selectedTab.classList.add(
+          'active'
+        );
+
+      }
+
+
+      /* =========================
+         ACTIVATE BUTTON
+      ========================= */
+
+      if (button) {
+
+        button.classList.add(
+          'active'
+        );
+
+      }
+
+
+      /* =========================
+         INITIALIZE STOCK RECEIPT
+      ========================= */
+
+      if (
+        tabId === 'receipt' &&
+        typeof initializeStockReceipt === 'function'
+      ) {
+
+        initializeStockReceipt();
+
+      }
+
+
+      /* =========================
+         INITIALIZE PPE ISSUANCE
+      ========================= */
+
+      if (
+        tabId === 'issuance' &&
+        typeof initializeIssuance === 'function'
+      ) {
+
+        initializeIssuance();
+
+      }
+
+    }
+
+  </script>
+
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

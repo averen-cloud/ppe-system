@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPE Request Form - Draft</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f3f6f9;color:#1f2937}
+.header{background:#0f3d2e;color:#fff;padding:22px 28px}.header h1{margin:0 0 5px;font-size:25px}.header p{margin:0;opacity:.85;font-size:14px}
+.container{max-width:1050px;margin:28px auto;padding:0 18px 40px}.card{background:#fff;border:1px solid #dbe2e8;border-radius:10px;margin-bottom:18px;box-shadow:0 2px 8px rgba(0,0,0,.04);overflow:hidden}
+.card-title{background:#eef6f1;padding:13px 18px;font-weight:700;border-bottom:1px solid #dbe2e8}.card-body{padding:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 22px}.field{display:flex;flex-direction:column;gap:6px}label{font-size:13px;font-weight:700}
+input,select{width:100%;padding:10px 11px;border:1px solid #cbd5df;border-radius:6px;background:#fff;font-size:14px}input[readonly]{background:#f7f9fa}
+.item-row{display:grid;grid-template-columns:1fr 130px 42px;gap:10px;align-items:end;margin-bottom:12px}
+.remove{height:38px;border:1px solid #e0a0a0;background:#fff5f5;color:#b42318;border-radius:6px;cursor:pointer;font-weight:bold}
+.add{margin-top:4px;padding:10px 15px;border:1px dashed #6b8f7b;background:#f4faf6;color:#0f3d2e;border-radius:6px;cursor:pointer;font-weight:700}
+.actions{display:flex;justify-content:flex-end;gap:10px;padding:18px 20px;background:#fafbfc;border-top:1px solid #e5e7eb}
+.btn{border:0;border-radius:6px;padding:11px 20px;font-weight:700;cursor:pointer}.secondary{background:#e5e7eb;color:#374151}.primary{background:#0f3d2e;color:#fff}
+.note{font-size:12px;color:#667085;margin-top:8px}.approver{padding:12px;background:#f7faf8;border:1px solid #dce9e1;border-radius:6px;margin-top:16px}.approver strong{color:#0f3d2e}
+.request-id{float:right;font-size:12px;color:#667085;font-weight:normal}
+.suggestions {
+  position:absolute;
+  top:100%;
+  left:0;
+  right:0;
+  background:#fff;
+  border:1px solid #cbd5df;
+  border-top:0;
+  border-radius:0 0 6px 6px;
+  max-height:220px;
+  overflow-y:auto;
+  z-index:1000;
+  display:none;
+  box-shadow:0 4px 8px rgba(0,0,0,.08);
+}
+
+.suggestion-item {
+  padding:10px 11px;
+  cursor:pointer;
+  font-size:14px;
+  border-bottom:1px solid #eef0f2;
+}
+
+.suggestion-item:hover {
+  background:#eef6f1;
+}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.item-row{grid-template-columns:1fr 100px 42px}}
+</style>
+</head>
+<body>
+<header class="header"><h1>PPE REQUEST FORM</h1><p>Personal Protective Equipment Request</p></header>
+<main class="container">
+<section class="card">
+<div class="card-title">Request Information</div>
+<div class="card-body">
+<div class="grid">
+<div class="field"><label>Date Requested</label><input type="date" id="requestDate"></div>
+<div class="field" style="position:relative">
+  <label>Requestor</label>
+
+  <input
+    id="requestor"
+    type="text"
+    autocomplete="off"
+    placeholder="Type Requestor Name"
+  >
+
+  <div
+    id="requestorSuggestions"
+    class="suggestions"
+  ></div>
+</div>
+<div class="field" style="position:relative">
+  <label>Project Name</label>
+
+  <input
+    id="projectName"
+    type="text"
+    autocomplete="off"
+    placeholder="Type Project Name"
+  >
+
+  <div
+    id="projectSuggestions"
+    class="suggestions"
+  ></div>
+</div>
+
+<div class="field">
+  <label>Project Code</label>
+  <input id="projectCode" readonly placeholder="Auto-populated">
+</div>
+<div class="field" style="position:relative">
+  <label>Name of Employee</label>
+
+  <input
+    id="employee"
+    type="text"
+    autocomplete="off"
+    placeholder="Type Employee Name"
+  >
+
+  <div
+    id="employeeSuggestions"
+    class="suggestions"
+  ></div>
+</div>
+<div class="field"><label>Employee Number</label><input id="employeeNo" readonly placeholder="Auto-populated"></div>
+</div>
+<div class="approver"><strong>Approver:</strong> <span id="approverName">Will be auto-populated based on Requestor Department</span><br><small id="approverEmail"></small></div>
+</div>
+</section>
+<section class="card">
+<div class="card-title">Requested PPE Items <span class="request-id">Request ID: Auto-generated on submission</span></div>
+<div class="card-body">
+<div id="items"></div>
+<button type="button" class="add" onclick="addItem()">+ Add Another PPE Item</button>
+<div class="note">Each item will be saved as a separate line under the same Request ID.</div>
+</div>
+<div class="actions"><button class="btn secondary" type="button" onclick="resetForm()">Clear</button><button class="btn primary" type="button" onclick="submitDraft()">Submit PPE Request</button></div>
+</section>
+</main>
+<script>
+let formData = {
+  requestors: [],
+  employees: [],
+  projects: [],
+  inventory: [],
+  approvers: []
+};
+
+let itemCount = 0;
+
+
+/* ================================
+   LOAD GOOGLE SHEETS DATA
+================================ */
+
+function loadFormData() {
+
+  google.script.run
+
+    .withSuccessHandler(function(data) {
+
+      formData = data;
+
+      loadRequestors();
+
+      loadEmployees();
+
+      loadProjects();
+
+      loadInventory();
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      alert(
+        'Unable to load Google Sheets data:\n' +
+        error.message
+      );
+
+    })
+
+    .getFormData();
+
+}
+
+
+/* ================================
+   REQUESTOR DROPDOWN
+================================ */
+
+function loadRequestors() {
+
+  const input =
+    document.getElementById('requestor');
+
+  input.value = '';
+
+}
+
+
+/* ================================
+   REQUESTOR SEARCH
+================================ */
+
+const requestorInput =
+  document.getElementById('requestor');
+
+const requestorSuggestions =
+  document.getElementById(
+    'requestorSuggestions'
+  );
+
+
+requestorInput.addEventListener(
+  'input',
+  function() {
+
+    const search =
+      this.value
+        .toLowerCase()
+        .trim();
+
+
+    requestorSuggestions.innerHTML = '';
+
+
+    if (!search) {
+
+      requestorSuggestions.style.display =
+        'none';
+
+      return;
+
+    }
+
+
+    const matches =
+      formData.requestors.filter(
+        function(requestor) {
+
+          const name =
+            String(
+              requestor['Requestor Name'] || ''
+            );
+
+          const active =
+            String(
+              requestor['Active'] || ''
+            ).toUpperCase();
+
+
+          return (
+            active === 'YES' &&
+            name
+              .toLowerCase()
+              .includes(search)
+          );
+
+        }
+      );
+
+
+    if (matches.length === 0) {
+
+      requestorSuggestions.style.display =
+        'none';
+
+      return;
+
+    }
+
+
+    matches.forEach(
+      function(requestor) {
+
+        const div =
+          document.createElement('div');
+
+        div.className =
+          'suggestion-item';
+
+        div.textContent =
+          requestor['Requestor Name'];
+
+
+        div.addEventListener(
+          'click',
+          function() {
+
+            requestorInput.value =
+              requestor['Requestor Name'];
+
+
+            requestorSuggestions.style.display =
+              'none';
+
+
+            loadDepartmentApprovers(
+              requestor['Department']
+            );
+
+          }
+        );
+
+
+        requestorSuggestions.appendChild(
+          div
+        );
+
+      }
+    );
+
+
+    requestorSuggestions.style.display =
+      'block';
+
+  }
+);
+
+document.addEventListener(
+  'click',
+  function(event) {
+
+    if (
+      !requestorInput.contains(event.target) &&
+      !requestorSuggestions.contains(event.target)
+    ) {
+
+      requestorSuggestions.style.display =
+        'none';
+
+    }
+
+  }
+);
+
+
+        
+
+
+/* ================================
+   EMPLOYEE DROPDOWN
+================================ */
+
+function loadEmployees() {
+
+  const input =
+    document.getElementById('employee');
+
+  input.value = '';
+
+  document.getElementById(
+    'employeeNo'
+  ).value = '';
+
+}
+
+
+/* ================================
+   EMPLOYEE SEARCH
+================================ */
+
+const employeeInput =
+  document.getElementById('employee');
+
+const employeeSuggestions =
+  document.getElementById(
+    'employeeSuggestions'
+  );
+
+
+employeeInput.addEventListener(
+  'input',
+  function() {
+
+    const search =
+      this.value
+        .toLowerCase()
+        .trim();
+
+
+    employeeSuggestions.innerHTML = '';
+
+
+    document.getElementById(
+      'employeeNo'
+    ).value = '';
+
+
+    if (!search) {
+
+      employeeSuggestions.style.display =
+        'none';
+
+      return;
+
+    }
+
+
+    const matches =
+      formData.employees.filter(
+        function(employee) {
+
+          const name =
+            String(
+              employee['Employee Name'] || ''
+            );
+
+          const active =
+            String(
+              employee['Active'] || ''
+            ).toUpperCase();
+
+
+          return (
+            active === 'YES' &&
+            name
+              .toLowerCase()
+              .includes(search)
+          );
+
+        }
+      );
+
+
+    if (matches.length === 0) {
+
+      employeeSuggestions.style.display =
+        'none';
+
+      return;
+
+    }
+
+
+    matches.forEach(
+      function(employee) {
+
+        const div =
+          document.createElement('div');
+
+        div.className =
+          'suggestion-item';
+
+        div.textContent =
+          employee['Employee Name'];
+
+
+        div.addEventListener(
+          'click',
+          function() {
+
+            employeeInput.value =
+              employee['Employee Name'];
+
+
+            document.getElementById(
+              'employeeNo'
+            ).value =
+              employee['Employee Number'];
+
+
+            employeeSuggestions.style.display =
+              'none';
+
+          }
+        );
+
+
+        employeeSuggestions.appendChild(
+          div
+        );
+
+      }
+    );
+
+
+    employeeSuggestions.style.display =
+      'block';
+
+  }
+);
+
+document.addEventListener(
+  'click',
+  function(event) {
+
+    if (
+      !employeeInput.contains(event.target) &&
+      !employeeSuggestions.contains(event.target)
+    ) {
+
+      employeeSuggestions.style.display =
+        'none';
+
+    }
+
+  }
+);
+
+
+/* ================================
+   PROJECT CODE
+================================ */
+
+function loadProjects() {
+
+  const input =
+    document.getElementById('projectName');
+
+  input.value = '';
+
+  document.getElementById(
+    'projectCode'
+  ).value = '';
+
+}
+
+
+/* ================================
+   PROJECT SELECTED
+================================ */
+
+/* ================================
+   PROJECT NAME SEARCH
+================================ */
+
+const projectInput =
+  document.getElementById('projectName');
+
+const projectSuggestions =
+  document.getElementById(
+    'projectSuggestions'
+  );
+
+
+projectInput.addEventListener(
+  'input',
+  function() {
+
+    const search =
+      this.value
+        .toLowerCase()
+        .trim();
+
+
+    projectSuggestions.innerHTML = '';
+
+
+    document.getElementById(
+      'projectCode'
+    ).value = '';
+
+
+    if (!search) {
+
+      projectSuggestions.style.display =
+        'none';
+
+      return;
+
+    }
+
+
+    const matches =
+      formData.projects.filter(
+        function(project) {
+
+          const name =
+            String(
+              project['Project Name'] || ''
+            );
+
+          const active =
+            String(
+              project['Active'] || ''
+            ).toUpperCase();
+
+
+          return (
+            active === 'YES' &&
+            name
+              .toLowerCase()
+              .includes(search)
+          );
+
+        }
+      );
+
+
+    if (matches.length === 0) {
+
+      projectSuggestions.style.display =
+        'none';
+
+      return;
+
+    }
+
+
+    matches.forEach(
+      function(project) {
+
+        const div =
+          document.createElement('div');
+
+        div.className =
+          'suggestion-item';
+
+        div.textContent =
+          project['Project Name'];
+
+
+        div.addEventListener(
+          'click',
+          function() {
+
+            projectInput.value =
+              project['Project Name'];
+
+
+            document.getElementById(
+              'projectCode'
+            ).value =
+              project['Project Code'];
+
+
+            projectSuggestions.style.display =
+              'none';
+
+          }
+        );
+
+
+        projectSuggestions.appendChild(
+          div
+        );
+
+      }
+    );
+
+
+    projectSuggestions.style.display =
+      'block';
+
+  }
+);
+
+document.addEventListener(
+  'click',
+  function(event) {
+
+    if (
+      !projectInput.contains(event.target) &&
+      !projectSuggestions.contains(event.target)
+    ) {
+
+      projectSuggestions.style.display =
+        'none';
+
+    }
+
+  }
+);
+
+
+/* ================================
+   APPROVERS
+================================ */
+
+function loadDepartmentApprovers(
+  department
+) {
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(approvers) {
+
+        if (
+          !approvers ||
+          approvers.length === 0
+        ) {
+
+          document
+            .getElementById(
+              'approverName'
+            )
+            .textContent =
+            'No approver configured';
+
+          document
+            .getElementById(
+              'approverEmail'
+            )
+            .textContent = '';
+
+          return;
+
+        }
+
+
+        const first =
+          approvers[0];
+
+
+        document
+          .getElementById(
+            'approverName'
+          )
+          .textContent =
+          first['Approver Name'];
+
+
+        document
+          .getElementById(
+            'approverEmail'
+          )
+          .textContent =
+          first['Approver Email'];
+
+      }
+    )
+
+    .withFailureHandler(
+      function(error) {
+
+        alert(
+          'Unable to load approvers:\n' +
+          error.message
+        );
+
+      }
+    )
+
+    .getApproversByDepartment(
+      department
+    );
+
+}
+
+
+/* ================================
+   PPE INVENTORY
+================================ */
+
+function loadInventory() {
+
+  if (itemCount === 0) {
+
+    addItem();
+
+  }
+
+}
+
+
+function addItem() {
+
+  itemCount++;
+
+
+  const d =
+    document.createElement('div');
+
+  d.className =
+    'item-row';
+
+  d.id =
+    'item-' + itemCount;
+
+
+  let options =
+    '<option value="">Select PPE Item</option>';
+
+
+  formData.inventory
+
+    .filter(function(item) {
+
+      return String(
+        item['Active']
+      ).toUpperCase() === 'YES';
+
+    })
+
+    .forEach(function(item) {
+
+      options +=
+        '<option value="' +
+        item['PPE Item'] +
+        '">' +
+        item['PPE Item'] +
+        '</option>';
+
+    });
+
+
+  d.innerHTML =
+
+    '<div class="field">' +
+
+      '<label>Item ' +
+      itemCount +
+      '</label>' +
+
+      '<select class="ppe-item">' +
+      options +
+      '</select>' +
+
+    '</div>' +
+
+    '<div class="field">' +
+
+      '<label>Quantity</label>' +
+
+      '<input class="ppe-qty" ' +
+      'type="number" min="1" step="1" ' +
+      'placeholder="Qty">' +
+
+    '</div>' +
+
+    '<button type="button" ' +
+    'class="remove" ' +
+    'onclick="removeItem(' +
+    itemCount +
+    ')">×</button>';
+
+
+  document
+    .getElementById('items')
+    .appendChild(d);
+
+}
+
+
+function removeItem(id) {
+
+  const row =
+    document.getElementById(
+      'item-' + id
+    );
+
+  if (row) {
+
+    row.remove();
+
+  }
+
+}
+
+
+/* ================================
+   SUBMIT
+================================ */
+
+function submitDraft() {
+
+  const requestDate =
+    document.getElementById(
+      'requestDate'
+    ).value;
+
+
+  const requestor =
+    document.getElementById(
+      'requestor'
+    ).value;
+
+
+  const projectName =
+  document.getElementById(
+    'projectName'
+  ).value;
+
+
+const projectCode =
+  document.getElementById(
+    'projectCode'
+  ).value;
+
+
+  const employee =
+    document.getElementById(
+      'employee'
+    ).value;
+
+
+  const employeeNo =
+    document.getElementById(
+      'employeeNo'
+    ).value;
+
+
+  if (
+  !requestDate ||
+  !requestor ||
+  !projectName ||
+  !projectCode ||
+  !employee
+) {
+
+  alert(
+    'Please complete the Requestor, ' +
+    'Project Name and Employee fields.'
+  );
+
+  return;
+
+}
+
+
+  const itemRows =
+    document.querySelectorAll(
+      '#items .item-row'
+    );
+
+
+  if (itemRows.length === 0) {
+
+    alert(
+      'Please add at least one PPE item.'
+    );
+
+    return;
+
+  }
+
+
+  const items = [];
+
+
+  itemRows.forEach(function(row) {
+
+    const ppeItem =
+      row.querySelector(
+        '.ppe-item'
+      ).value;
+
+
+    const quantity =
+      row.querySelector(
+        '.ppe-qty'
+      ).value;
+
+
+    if (ppeItem && quantity) {
+
+      const inventory =
+        formData.inventory.find(
+          function(item) {
+
+            return item['PPE Item'] ===
+              ppeItem;
+
+          }
+        );
+
+
+      items.push({
+
+        itemNo:
+          inventory
+            ? inventory['Item No']
+            : '',
+
+        ppeItem:
+          ppeItem,
+
+        quantity:
+          Number(quantity)
+
+      });
+
+    }
+
+  });
+
+
+  if (items.length === 0) {
+
+    alert(
+      'Please select PPE item and quantity.'
+    );
+
+    return;
+
+  }
+
+
+  const request = {
+
+  requestDate:
+    requestDate,
+
+  requestor:
+    requestor,
+
+  projectCode:
+    projectCode,
+
+  projectSite:
+    projectName,
+
+  employeeName:
+    employee,
+
+  employeeNumber:
+    employeeNo,
+
+  items:
+    items
+
+};
+
+
+  const button =
+    document.querySelector(
+      '.primary'
+    );
+
+
+  button.disabled = true;
+
+  button.textContent =
+    'Submitting...';
+
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(result) {
+
+        alert(
+          'PPE Request submitted successfully!\n\n' +
+          'Request ID: ' +
+          result.requestId
+        );
+
+
+        resetForm();
+
+
+        button.disabled = false;
+
+        button.textContent =
+          'Submit PPE Request';
+
+      }
+    )
+
+    .withFailureHandler(
+      function(error) {
+
+        alert(
+          'Submission failed:\n\n' +
+          error.message
+        );
+
+
+        button.disabled = false;
+
+        button.textContent =
+          'Submit PPE Request';
+
+      }
+    )
+
+    .submitPPERequest(
+      request
+    );
+
+}
+
+
+/* ================================
+   RESET
+================================ */
+
+function resetForm() {
+
+  document.getElementById(
+    'requestor'
+  ).value = '';
+
+
+  document.getElementById(
+    'projectName'
+  ).value = '';
+
+
+document.getElementById(
+    'projectCode'
+  ).value = '';
+
+
+  document.getElementById(
+    'employee'
+  ).value = '';
+
+
+  document.getElementById(
+    'employeeNo'
+  ).value = '';
+
+
+  document.getElementById(
+    'approverName'
+  ).textContent =
+    'Will be auto-populated based on Department';
+
+
+  document.getElementById(
+    'approverEmail'
+  ).textContent = '';
+
+
+  document.getElementById(
+    'items'
+  ).innerHTML = '';
+
+
+  itemCount = 0;
+
+  addItem();
+
+}
+
+
+/* ================================
+   START
+================================ */
+
+loadFormData();
+</script>
+</body>
+</html>

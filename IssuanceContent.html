@@ -1,8 +1,35 @@
-<style>
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>PPE Issuance</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
 
     .container {
       max-width: 1100px;
       margin: auto;
+      padding: 20px;
     }
 
     .header {
@@ -45,6 +72,7 @@
     }
 
     input,
+    select,
     textarea {
       width: 100%;
       box-sizing: border-box;
@@ -52,6 +80,7 @@
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 14px;
+      background: white;
     }
 
     .search-input {
@@ -87,6 +116,11 @@
 
     .btn-release:hover {
       background: #274e13;
+    }
+
+    .btn-release:disabled {
+      background: #999;
+      cursor: not-allowed;
     }
 
     .info-grid {
@@ -179,6 +213,10 @@
 
     @media (max-width: 700px) {
 
+      .container {
+        padding: 10px;
+      }
+
       .info-grid {
         grid-template-columns: 1fr;
       }
@@ -189,6 +227,7 @@
 
       .search-input {
         width: 100%;
+        min-width: 0;
       }
 
       .btn-search {
@@ -199,8 +238,9 @@
 
   </style>
 
+</head>
 
-
+<body>
 
 <div class="container">
 
@@ -231,18 +271,20 @@
         id="requestId"
         class="search-input"
       >
-      <option value="">
-        Loading approved requests...
-      </option>
+
+        <option value="">
+          Loading approved requests...
+        </option>
+
       </select>
 
       <button
-       type="button"
-       class="btn-search"
-       onclick="findRequest(); return false;"
+        type="button"
+        class="btn-search"
+        onclick="findRequest(); return false;"
       >
-  Find Request
-</button>
+        Find Request
+      </button>
 
     </div>
 
@@ -412,12 +454,14 @@
         <thead>
 
           <tr>
-                <th>Item No</th>
-                <th>PPE Item</th>
-                <th>Requested Qty</th>
-                <th>Already Released</th>
-                <th>Release Now</th>
-                <th>Remaining Balance</th>
+
+            <th>Item No</th>
+            <th>PPE Item</th>
+            <th>Requested Qty</th>
+            <th>Already Released</th>
+            <th>Release Now</th>
+            <th>Remaining Balance</th>
+
           </tr>
 
         </thead>
@@ -490,697 +534,15 @@
 
 <script>
 
+  /*
+   * Backend conversion will be added next.
+   *
+   * The current HTML/design is intentionally
+   * preserved first.
+   */
+
   let currentRequest = null;
 
-
-// ============================================
-// LOAD APPROVED REQUEST IDs
-// ============================================
-
-function loadApprovedRequests() {
-
-  const dropdown =
-    document.getElementById('requestId');
-
-  dropdown.innerHTML =
-    '<option value="">Loading approved requests...</option>';
-
-
-  google.script.run
-
-    .withSuccessHandler(function(requestIds) {
-
-      dropdown.innerHTML =
-        '<option value="">Select an approved Request ID</option>';
-
-
-      if (
-        !requestIds ||
-        requestIds.length === 0
-      ) {
-
-        dropdown.innerHTML =
-          '<option value="">No approved requests available</option>';
-
-        return;
-
-      }
-
-
-      requestIds.forEach(function(requestId) {
-
-        const option =
-          document.createElement('option');
-
-        option.value =
-          requestId;
-
-        option.textContent =
-          requestId;
-
-        dropdown.appendChild(option);
-
-      });
-
-    })
-
-    .withFailureHandler(function(error) {
-
-      dropdown.innerHTML =
-        '<option value="">Unable to load requests</option>';
-
-      showError(
-        'Unable to load approved requests: ' +
-        error.message
-      );
-
-    })
-
-    .getApprovedRequestsForIssuance();
-
-}
-
-
-// ============================================
-// FIND APPROVED REQUEST
-// ============================================
-
-function findRequest() {
-
-  const requestId =
-    document
-      .getElementById('requestId')
-      .value
-      .trim();
-
-  hideMessages();
-
-  if (!requestId) {
-
-    showError(
-      'Please select a Request ID.'
-    );
-
-    return;
-
-  }
-
-  document
-    .getElementById('loadingMessage')
-    .style.display = 'block';
-
-
-  google.script.run
-
-    .withSuccessHandler(function(result) {
-
-      document
-        .getElementById('loadingMessage')
-        .style.display = 'none';
-
-      /*
-       * TEMPORARY DIAGNOSTIC
-       * Show exactly what the server returned.
-       */
-
-      if (!result) {
-
-        showError(
-          'Server returned NULL for Request ID: ' +
-          requestId
-        );
-
-        return;
-
-      }
-
-      if (!Array.isArray(result)) {
-
-        showError(
-          'Server returned an unexpected result for ' +
-          requestId +
-          ': ' +
-          JSON.stringify(result)
-        );
-
-        return;
-
-      }
-
-      if (result.length === 0) {
-
-        showError(
-          'Server returned 0 rows for Request ID: ' +
-          requestId
-        );
-
-        return;
-
-      }
-
-      currentRequest = result;
-
-      displayRequest(result);
-
-    })
-
-    .withFailureHandler(function(error) {
-
-      document
-        .getElementById('loadingMessage')
-        .style.display = 'none';
-
-      showError(
-        'Server error: ' +
-        error.message
-      );
-
-    })
-
-    .loadApprovedRequestForIssuance(
-       requestId
-    );
-
-}
-
-
-  // ============================================
-  // DISPLAY REQUEST
-  // ============================================
-
-  function displayRequest(rows) {
-
-  if (
-    !rows ||
-    rows.length === 0
-  ) {
-
-    showError(
-      'No PPE items found for this request.'
-    );
-
-    return;
-
-  }
-
-  const firstRow =
-    rows[0];
-
-
-  // ============================================
-  // REQUEST DETAILS
-  // ============================================
-
-  document
-    .getElementById('displayRequestId')
-    .textContent =
-    firstRow['Request ID'] || '';
-
-  document
-    .getElementById('displayRequestor')
-    .textContent =
-    firstRow['Requestor'] || '';
-
-  document
-    .getElementById('displayEmployeeNumber')
-    .textContent =
-    firstRow['Employee Number'] || '';
-
-  document
-    .getElementById('displayEmployeeName')
-    .textContent =
-    firstRow['Employee Name'] || '';
-
-  document
-    .getElementById('displayDepartment')
-    .textContent =
-    firstRow['Department'] || '';
-
-  document
-    .getElementById('displayProjectCode')
-    .textContent =
-    firstRow['Project Code'] || '';
-
-  document
-    .getElementById('displayProjectSite')
-    .textContent =
-    firstRow['Project Site'] || '';
-
-  document
-    .getElementById('displayStatus')
-    .textContent =
-    firstRow['Current Status'] || '';
-
-
-  // ============================================
-  // PPE ITEMS
-  // ============================================
-
-  const tbody =
-    document
-      .getElementById(
-        'itemsTableBody'
-      );
-
-  tbody.innerHTML = '';
-
-
-  rows.forEach(
-    function(row, index) {
-
-      const requestedQty =
-        Number(
-          row['Quantity']
-        ) || 0;
-
-      const alreadyReleased =
-        Number(
-          row['Already Released Qty']
-        ) || 0;
-
-      const balanceQty =
-        Number(
-          row['Balance Qty']
-        ) || 0;
-
-
-      const tr =
-        document.createElement(
-          'tr'
-        );
-
-
-      tr.innerHTML = `
-
-        <td>
-          ${escapeHtml(
-            row['Item No'] || ''
-          )}
-        </td>
-
-        <td>
-          ${escapeHtml(
-            row['PPE Item'] || ''
-          )}
-        </td>
-
-        <td>
-          ${requestedQty}
-        </td>
-
-        <td>
-          ${alreadyReleased}
-        </td>
-
-        <td>
-
-          <input
-            type="number"
-            min="0"
-            max="${balanceQty}"
-            value="${balanceQty}"
-            class="releasedQty"
-            data-index="${index}"
-          >
-
-        </td>
-
-        <td>
-
-          <span
-            class="balance"
-            data-index="${index}"
-          >
-            ${balanceQty}
-          </span>
-
-        </td>
-
-      `;
-
-
-      tbody.appendChild(
-        tr
-      );
-
-    }
-  );
-
-
-  attachQuantityEvents();
-
-
-  // ============================================
-  // SHOW SECTIONS
-  // ============================================
-
-  document
-    .getElementById(
-      'requestSection'
-    )
-    .classList
-    .remove('hidden');
-
-  document
-    .getElementById(
-      'itemsSection'
-    )
-    .classList
-    .remove('hidden');
-
-  document
-    .getElementById(
-      'releaseSection'
-    )
-    .classList
-    .remove('hidden');
-
-}
-
-
-  // ============================================
-  // RELEASE QTY / BALANCE
-  // ============================================
-
-  function attachQuantityEvents() {
-
-    const inputs =
-      document.querySelectorAll(
-        '.releasedQty'
-      );
-
-
-    inputs.forEach(function(input) {
-
-      input.addEventListener(
-        'input',
-        function() {
-
-          const index =
-            Number(
-              input.dataset.index
-            );
-
-          const requested =
-            Number(
-              currentRequest[index]['Quantity']
-            ) || 0;
-
-          const alreadyReleased =
-            Number(
-              currentRequest[index]['Already Released Qty']
-            ) || 0;
-
-          const availableBalance =
-            Math.max(
-              requested -
-              alreadyReleased,
-              0
-            );
-
-
-          let released =
-            Number(
-              input.value
-            ) || 0;
-
-
-          // Prevent negative quantity
-
-          if (released < 0) {
-
-            released = 0;
-
-            input.value = 0;
-
-          }
-
-
-          // Prevent releasing more than
-          // the remaining balance
-
-          if (
-            released >
-            availableBalance
-          ) {
-
-            released =
-              availableBalance;
-
-            input.value =
-              availableBalance;
-
-          }
-
-
-          // Remaining balance AFTER
-          // this issuance
-
-          const balance =
-            availableBalance -
-            released;
-
-
-          const balanceElement =
-            document.querySelector(
-              `.balance[data-index="${index}"]`
-            );
-
-
-          if (balanceElement) {
-
-            balanceElement.textContent =
-              balance;
-
-          }
-
-        }
-      );
-
-    });
-
-  }
-
-
-  // ============================================
-// RELEASE PPE
-// ============================================
-
-function releasePPE() {
-
-  hideMessages();
-
-  if (
-    !currentRequest ||
-    !Array.isArray(currentRequest) ||
-    currentRequest.length === 0
-  ) {
-
-    showError(
-      'Please find an approved PPE request first.'
-    );
-
-    return;
-
-  }
-
-  const requestId =
-    document
-      .getElementById('requestId')
-      .value
-      .trim();
-
-  if (!requestId) {
-
-    showError(
-      'Please select a Request ID.'
-    );
-
-    return;
-
-  }
-
-  const releasedInputs =
-    document.querySelectorAll(
-      '.releasedQty'
-    );
-
-  const issuanceItems = [];
-
-  currentRequest.forEach(function(row, index) {
-
-    const requestedQty =
-      Number(row['Quantity']) || 0;
-
-    const input =
-      releasedInputs[index];
-
-    const releasedQty =
-      Number(input.value) || 0;
-
-    if (releasedQty < 0) {
-
-      throw new Error(
-        'Released quantity cannot be negative.'
-      );
-
-    }
-
-    if (releasedQty > requestedQty) {
-
-      throw new Error(
-        'Released quantity for ' +
-        row['PPE Item'] +
-        ' cannot exceed requested quantity.'
-      );
-
-    }
-
-    issuanceItems.push({
-
-      itemNo:
-        row['Item No'] || '',
-
-      ppeItem:
-        row['PPE Item'] || '',
-
-      requestedQty:
-        requestedQty,
-
-      releasedQty:
-        releasedQty,
-
-      balanceQty:
-        requestedQty - releasedQty
-
-    });
-
-  });
-
-  if (issuanceItems.length === 0) {
-
-    showError(
-      'No PPE items available for issuance.'
-    );
-
-    return;
-
-  }
-
-  const releasedBy =
-    document
-      .getElementById('issuanceReleasedBy')
-      ?.value
-      ?.trim() || '';
-
-  const remarksElement =
-  document.getElementById('issuanceRemarks');
-
-  const remarks = remarksElement
-  ? String(remarksElement.value || '').trim()
-  : '';
-
-  console.log('REMARKS FROM FORM:', remarks);
-
-  const issuanceData = {  
-
-    requestId:
-      requestId,
-
-    releaseDate:
-      new Date().toISOString(),
-
-    employeeNumber:
-      currentRequest[0]['Employee Number'] || '',
-
-    employeeName:
-      currentRequest[0]['Employee Name'] || '',
-
-    department:
-      currentRequest[0]['Department'] || '',
-
-    projectCode:
-      currentRequest[0]['Project Code'] || '',
-
-    projectSite:
-      currentRequest[0]['Project Site'] || '',
-
-    releasedBy:
-      releasedBy,
-
-    remarks:
-      remarks,
-
-    items:
-      issuanceItems
-
-  };
-
-  const button =
-    document.querySelector(
-      '.btn-release'
-    );
-
-  if (button) {
-
-    button.disabled = true;
-
-    button.textContent =
-      'Saving...';
-
-  }
-
-  google.script.run
-
-    .withSuccessHandler(function(result) {
-
-      if (button) {
-
-        button.disabled = false;
-
-        button.textContent =
-          'Release PPE';
-
-      }
-
-      showSuccess(
-        result.message ||
-        'PPE issuance saved successfully.'
-      );
-
-      // Refresh the approved request list
-      loadApprovedRequests();
-
-    })
-
-    .withFailureHandler(function(error) {
-
-      if (button) {
-
-        button.disabled = false;
-
-        button.textContent =
-          'Release PPE';
-
-      }
-
-      showError(
-        error.message ||
-        'Unable to save PPE issuance.'
-      );
-
-    })
-
-    .savePPEIssuance(
-      issuanceData
-  );
-
-}
-
-
-  // ============================================
-  // ERROR
-  // ============================================
 
   function showError(message) {
 
@@ -1198,10 +560,6 @@ function releasePPE() {
   }
 
 
-  // ============================================
-  // SUCCESS
-  // ============================================
-
   function showSuccess(message) {
 
     const element =
@@ -1218,65 +576,86 @@ function releasePPE() {
   }
 
 
-  // ============================================
-  // HIDE MESSAGES
-  // ============================================
-
   function hideMessages() {
 
-    document
-      .getElementById('errorMessage')
-      .style.display = 'none';
+    const error =
+      document.getElementById(
+        'errorMessage'
+      );
 
+    const success =
+      document.getElementById(
+        'successMessage'
+      );
 
-    document
-      .getElementById('successMessage')
-      .style.display = 'none';
+    if (error) {
+      error.style.display = 'none';
+    }
+
+    if (success) {
+      success.style.display = 'none';
+    }
 
   }
 
-
-  // ============================================
-  // HTML ESCAPE
-  // ============================================
 
   function escapeHtml(value) {
 
     return String(value)
 
-      .replace(/&/g, '&amp;')
+      .replace(
+        /&/g,
+        '&amp;'
+      )
 
-      .replace(/</g, '&lt;')
+      .replace(
+        /</g,
+        '&lt;'
+      )
 
-      .replace(/>/g, '&gt;')
+      .replace(
+        />/g,
+        '&gt;'
+      )
 
-      .replace(/"/g, '&quot;')
+      .replace(
+        /"/g,
+        '&quot;'
+      )
 
-      .replace(/'/g, '&#039;');
+      .replace(
+        /'/g,
+        '&#039;'
+      );
 
   }
 
 
-  // ============================================
-// LOAD APPROVED REQUESTS WHEN PAGE OPENS
-// ============================================
+  /*
+   * Temporary functions so the page
+   * does not produce errors before
+   * backend conversion.
+   */
 
-function initializeIssuance() {
+  function findRequest() {
 
-  loadApprovedRequests();
+    showError(
+      'PPE Issuance backend connection will be added next.'
+    );
 
-}
+  }
+
+
+  function releasePPE() {
+
+    showError(
+      'PPE Issuance backend connection will be added next.'
+    );
+
+  }
+
 
 </script>
 
-
-
-
-
-
-
-
-
-
-
-
+</body>
+</html>

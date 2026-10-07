@@ -1035,22 +1035,28 @@
     fetch(
   'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec?api=getInventoryDashboardData'
 )
-
   .then(function(response) {
 
-    if (!response.ok) {
+    console.log(
+      'Inventory API response:',
+      response.status
+    );
 
+    if (!response.ok) {
       throw new Error(
         'Unable to connect to PPE backend.'
       );
-
     }
 
     return response.json();
 
   })
-
   .then(function(data) {
+
+    console.log(
+      'Inventory API data:',
+      data
+    );
 
     inventoryDashboardState.data =
       data;
@@ -1067,8 +1073,12 @@
     renderDashboard(data);
 
   })
-
   .catch(function(error) {
+
+    console.error(
+      'Inventory Dashboard Error:',
+      error
+    );
 
     const message =
       document.getElementById(
@@ -1084,18 +1094,10 @@
       message.style.display =
         'block';
 
-    } else {
-
-      console.error(
-        'Inventory Dashboard Error:',
-        error
-      );
-
     }
-
   });
 
-  
+  } 
 
 
   /*

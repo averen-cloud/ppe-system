@@ -190,61 +190,248 @@
   function loadStockReceiptInventory() {
 
   const select =
-    document.getElementById('stockReceiptItemNo');
+    document.getElementById(
+      'stockReceiptItemNo'
+    );
+
 
   if (!select) {
+
     return;
+
   }
+
 
   select.innerHTML =
     '<option value="">Loading PPE items...</option>';
 
-  google.script.run
 
-    .withSuccessHandler(function(data) {
+  const callbackName =
+    'ppeStockReceiptInventory_' +
+    Date.now();
 
-      inventoryItems = data || [];
 
-      select.innerHTML =
-        '<option value="">Select PPE Item</option>';
+  const script =
+    document.createElement(
+      'script'
+    );
 
-      inventoryItems.forEach(function(item) {
 
-        const option =
-          document.createElement('option');
+  let completed =
+    false;
 
-        option.value =
-          String(item.itemNo || '').trim();
 
-        option.textContent =
-          item.itemNo +
-          ' - ' +
-          item.ppeItem +
-          ' (' +
-          item.unit +
-          ')';
+  /*
+   * ==========================================================
+   * CLEANUP
+   * ==========================================================
+   */
 
-        select.appendChild(option);
+  function cleanup() {
 
-      });
+    if (completed) {
 
-    })
+      return;
 
-    .withFailureHandler(function(error) {
+    }
+
+
+    completed =
+      true;
+
+
+    delete window[callbackName];
+
+
+    if (
+      script.parentNode
+    ) {
+
+      script.parentNode.removeChild(
+        script
+      );
+
+    }
+
+  }
+
+
+  /*
+   * ==========================================================
+   * SUCCESS CALLBACK
+   * ==========================================================
+   */
+
+  window[callbackName] =
+    function(data) {
+
+      if (completed) {
+
+        return;
+
+      }
+
+
+      try {
+
+        console.log(
+          'Stock Receipt Inventory:',
+          data
+        );
+
+
+        inventoryItems =
+          data || [];
+
+
+        select.innerHTML =
+          '<option value="">Select PPE Item</option>';
+
+
+        inventoryItems.forEach(
+          function(item) {
+
+            const option =
+              document.createElement(
+                'option'
+              );
+
+
+            option.value =
+              String(
+                item.itemNo || ''
+              ).trim();
+
+
+            option.textContent =
+              item.itemNo +
+              ' - ' +
+              item.ppeItem +
+              ' (' +
+              item.unit +
+              ')';
+
+
+            select.appendChild(
+              option
+            );
+
+          }
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          'Stock Receipt Inventory Error:',
+          error
+        );
+
+
+        select.innerHTML =
+          '<option value="">Unable to load PPE items</option>';
+
+
+        showStockReceiptMessage(
+          error.message ||
+          'Unable to load PPE inventory.',
+          false
+        );
+
+      }
+
+
+      cleanup();
+
+    };
+
+
+  /*
+   * ==========================================================
+   * API URL
+   * ==========================================================
+   */
+
+  script.src =
+    'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec' +
+    '?api=getActivePPEInventory' +
+    '&callback=' +
+    encodeURIComponent(
+      callbackName
+    );
+
+
+  /*
+   * ==========================================================
+   * API ERROR
+   * ==========================================================
+   */
+
+  script.onerror =
+    function() {
+
+      console.error(
+        'Stock Receipt Inventory API failed.'
+      );
+
 
       select.innerHTML =
         '<option value="">Unable to load PPE items</option>';
 
+
       showStockReceiptMessage(
-        error && error.message
-          ? error.message
-          : 'Unable to load PPE inventory.',
+        'Unable to connect to PPE Inventory API.',
         false
       );
 
-    })
 
-    .getActivePPEInventory();
+      cleanup();
+
+    };
+
+
+  /*
+   * ==========================================================
+   * TIMEOUT
+   * ==========================================================
+   */
+
+  setTimeout(
+    function() {
+
+      if (completed) {
+
+        return;
+
+      }
+
+
+      select.innerHTML =
+        '<option value="">Unable to load PPE items</option>';
+
+
+      showStockReceiptMessage(
+        'PPE inventory is taking too long to load. Please try again.',
+        false
+      );
+
+
+      cleanup();
+
+    },
+    15000
+  );
+
+
+  /*
+   * ==========================================================
+   * START API REQUEST
+   * ==========================================================
+   */
+
+  document.body.appendChild(
+    script
+  );
 
 }
 

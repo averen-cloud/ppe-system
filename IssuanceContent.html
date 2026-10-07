@@ -1327,6 +1327,10 @@ function releasePPE() {
   };
 
 
+  // ============================================
+  // BUTTON
+  // ============================================
+
   const releaseButton =
     document.querySelector(
       '.btn-release'
@@ -1345,128 +1349,151 @@ function releasePPE() {
 
 
   // ============================================
-  // SEND TO GOOGLE APPS SCRIPT
+  // JSONP SAVE
   // ============================================
 
-  const formData =
-    new URLSearchParams();
+  const callbackName =
+    'ppeIssuanceSave_' +
+    Date.now();
 
 
-  formData.append(
-    'api',
-    'savePPEIssuance'
-  );
-
-
-  formData.append(
-    'data',
-    JSON.stringify(
-      issuanceData
-    )
-  );
-
-
-  fetch(
-    API_URL,
-    {
-      method: 'POST',
-
-      body:
-        formData
-    }
-  )
-  .then(
-    function(response) {
-
-      return response.text();
-
-    }
-  )
-  .then(
-    function(text) {
-
-      let result;
+  window[callbackName] =
+    function(result) {
 
       try {
 
-        result =
-          JSON.parse(text);
+        if (
+          !result ||
+          result.success !== true
+        ) {
 
-      } catch (error) {
+          throw new Error(
+            result &&
+            result.error
+              ? result.error
+              : 'PPE issuance could not be saved.'
+          );
 
-        throw new Error(
-          'Invalid response from PPE backend.'
-        );
-
-      }
-
-
-      if (
-        !result ||
-        result.success !== true
-      ) {
-
-        throw new Error(
-          result &&
-          result.error
-            ? result.error
-            : 'PPE issuance could not be saved.'
-        );
-
-      }
+        }
 
 
-      // ============================================
-      // SUCCESS
-      // ============================================
+        // ========================================
+        // SUCCESS
+        // ========================================
 
-      showSuccess(
-        result.message ||
-        'PPE issuance saved successfully.'
-      );
-
-
-      if (releaseButton) {
-
-        releaseButton.disabled =
-          true;
-
-        releaseButton.textContent =
-          'Released Successfully';
-
-      }
-
-
-      const statusElement =
-        document.getElementById(
-          'displayStatus'
+        showSuccess(
+          result.message ||
+          'PPE issuance saved successfully.'
         );
 
 
-      if (statusElement) {
+        if (releaseButton) {
 
-        statusElement.textContent =
-          result.status ||
-          'Issued';
+          releaseButton.disabled =
+            true;
+
+          releaseButton.textContent =
+            'Released Successfully';
+
+        }
+
+
+        const statusElement =
+          document.getElementById(
+            'displayStatus'
+          );
+
+
+        if (statusElement) {
+
+          statusElement.textContent =
+            result.status ||
+            'Issued';
+
+        }
 
       }
 
-    }
-  )
-  .catch(
-    function(error) {
+      catch (error) {
 
-      console.error(
-        'PPE issuance error:',
-        error
-      );
+        console.error(
+          'PPE issuance error:',
+          error
+        );
 
+
+        showError(
+          error &&
+          error.message
+            ? error.message
+            : 'Unable to save PPE issuance.'
+        );
+
+
+        if (releaseButton) {
+
+          releaseButton.disabled =
+            false;
+
+          releaseButton.textContent =
+            'Release PPE';
+
+        }
+
+      }
+
+      finally {
+
+        delete window[callbackName];
+
+        const callbackScript =
+          document.getElementById(
+            callbackName
+          );
+
+        if (callbackScript) {
+          callbackScript.remove();
+        }
+
+      }
+
+    };
+
+
+  // ============================================
+  // CREATE SCRIPT REQUEST
+  // ============================================
+
+  const script =
+    document.createElement(
+      'script'
+    );
+
+
+  script.id =
+    callbackName;
+
+
+  script.src =
+    API_URL +
+    '?api=savePPEIssuance' +
+    '&data=' +
+    encodeURIComponent(
+      JSON.stringify(
+        issuanceData
+      )
+    ) +
+    '&callback=' +
+    encodeURIComponent(
+      callbackName
+    );
+
+
+  script.onerror =
+    function() {
 
       showError(
-        error &&
-        error.message
-          ? error.message
-          : 'Unable to save PPE issuance.'
+        'Unable to connect to PPE backend.'
       );
 
 
@@ -1480,10 +1507,22 @@ function releasePPE() {
 
       }
 
-    }
-  );
+
+      delete window[callbackName];
+
+      script.remove();
+
+    };
+
+
+  document
+    .body
+    .appendChild(
+      script
+    );
 
 }
+
 
 
   

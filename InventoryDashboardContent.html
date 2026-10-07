@@ -1,0 +1,3896 @@
+<style>
+
+  /*
+   * ==========================================================
+   * PPE INVENTORY DASHBOARD
+   * ==========================================================
+   */
+
+  .inventory-dashboard-container {
+    font-family: Arial, sans-serif;
+    background: #f5f6f8;
+    margin: 0;
+    padding: 25px;
+    color: #222;
+  }
+
+  .inventory-dashboard-container h1 {
+    margin-bottom: 5px;
+  }
+
+  .inventory-dashboard-container h2 {
+    margin-top: 0;
+  }
+
+  .inventory-dashboard-container .subtitle {
+    color: #666;
+    margin-bottom: 25px;
+  }
+
+
+  /*
+   * ========================================================== 
+   * CARDS
+   * ==========================================================
+   */
+
+  .inventory-dashboard-container .cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  .inventory-dashboard-container .card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+
+  .inventory-dashboard-container .card-title {
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .inventory-dashboard-container .card-value {
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+
+  /*
+   * ==========================================================
+   * SECTION
+   * ==========================================================
+   */
+
+  .inventory-dashboard-container .section {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+  }
+
+
+  /*
+   * ==========================================================
+   * TABLE
+   * ==========================================================
+   */
+
+  .inventory-dashboard-container .table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .inventory-dashboard-container table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 750px;
+  }
+
+  .inventory-dashboard-container th,
+  .inventory-dashboard-container td {
+    padding: 11px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .inventory-dashboard-container th {
+  background: #20527d;
+  color: white;
+  font-weight: bold;
+  padding: 11px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+  white-space: nowrap;
+}
+
+  .inventory-dashboard-container .number {
+    text-align: right;
+  }
+
+
+  /*
+   * ==========================================================
+   * STATUS
+   * ==========================================================
+   */
+
+  .inventory-dashboard-container .low-stock {
+    font-weight: bold;
+    color: #b7791f;
+  }
+
+  .inventory-dashboard-container .out-of-stock {
+    font-weight: bold;
+    color: #c53030;
+  }
+
+  .inventory-dashboard-container .in-stock {
+    font-weight: bold;
+    color: #2f855a;
+  }
+
+
+  /*
+   * ==========================================================
+   * TRANSACTION TYPE
+   * ==========================================================
+   */
+
+  .inventory-dashboard-container .transaction-receipt {
+    color: #198754;
+    font-weight: 600;
+  }
+
+  .inventory-dashboard-container .transaction-issuance {
+    color: #dc3545;
+    font-weight: 600;
+  }
+
+
+  /*
+   * ==========================================================
+   * REFRESH
+   * ==========================================================
+   */
+
+  .inventory-dashboard-container .refresh-area {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .inventory-dashboard-container .refresh-btn {
+    background: #1a73e8;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .inventory-dashboard-container .refresh-btn:hover {
+    opacity: 0.9;
+  }
+
+  .inventory-dashboard-container .refresh-btn:disabled {
+    background: #999;
+    cursor: not-allowed;
+  }
+
+  .inventory-dashboard-container .last-updated {
+    font-size: 13px;
+    color: #666;
+  }
+
+
+  /*
+   * ==========================================================
+   * LOADING
+   * ==========================================================
+   */
+
+  .inventory-dashboard-container .loading {
+    text-align: center;
+    padding: 30px;
+    color: #777;
+  }
+
+
+  /*
+   * ==========================================================
+   * SEARCH / FILTER
+   * ==========================================================
+   */
+
+  .inventory-dashboard-container .filter-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+
+  .inventory-dashboard-container .filter-row input {
+    flex: 1;
+    min-width: 220px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+
+  .inventory-dashboard-container .filter-row select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: white;
+  }
+
+
+  /*
+   * ==========================================================
+   * PAGINATION
+   * ==========================================================
+   */
+
+  .inventory-dashboard-container .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .inventory-dashboard-container .pagination-info {
+    font-size: 13px;
+    color: #666;
+  }
+
+  .inventory-dashboard-container .pagination-buttons {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .inventory-dashboard-container .page-btn {
+    min-width: 34px;
+    padding: 7px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: white;
+    cursor: pointer;
+  }
+
+  .inventory-dashboard-container .page-btn:hover {
+    background: #f1f3f5;
+  }
+
+  .inventory-dashboard-container .page-btn.active {
+    background: #1a73e8;
+    color: white;
+    border-color: #1a73e8;
+  }
+
+  .inventory-dashboard-container .page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+
+  /*
+   * ==========================================================
+   * VIEW DETAILS BUTTON
+   * ==========================================================
+   */
+
+  .inventory-dashboard-container .view-button {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    background: white;
+    font-weight: 600;
+  }
+
+  .inventory-dashboard-container .view-button:hover {
+    background: #f1f3f5;
+  }
+
+
+  /*
+   * ==========================================================
+   * DETAIL SECTION
+   * ==========================================================
+   */
+
+  .inventory-dashboard-container .detail-section {
+    display: none;
+  }
+
+  .inventory-dashboard-container .detail-section table {
+    margin-bottom: 10px;
+  }
+
+  .inventory-dashboard-container .detail-close-area {
+    margin-top: 20px;
+    text-align: right;
+  }
+
+  .inventory-dashboard-container .detail-close-button {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #f5f5f5;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+
+  /*
+   * ==========================================================
+   * RESPONSIVE
+   * ==========================================================
+   */
+
+  @media (max-width: 900px) {
+
+    .inventory-dashboard-container .cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+  }
+
+  @media (max-width: 600px) {
+
+    .inventory-dashboard-container {
+      padding: 15px;
+    }
+
+    .inventory-dashboard-container .cards {
+      grid-template-columns: 1fr;
+    }
+
+    .inventory-dashboard-container .filter-row {
+      flex-direction: column;
+    }
+
+    .inventory-dashboard-container .filter-row input,
+    .inventory-dashboard-container .filter-row select {
+      width: 100%;
+    }
+
+    .inventory-dashboard-container .pagination {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+  }
+
+</style>
+
+
+<div class="inventory-dashboard-container">
+
+
+  <!-- ==========================================================
+       REFRESH
+       ========================================================== -->
+
+  <div class="refresh-area">
+
+    <div
+      id="lastUpdated"
+      class="last-updated"
+    >
+      Last updated: —
+    </div>
+
+    <button
+      type="button"
+      id="inventoryDashboardRefreshButton"
+      class="refresh-btn"
+      onclick="loadDashboard()"
+    >
+      Refresh
+    </button>
+
+  </div>
+
+
+  <!-- ==========================================================
+       HEADER
+       ========================================================== -->
+
+  <h1>
+    PPE Inventory Dashboard
+  </h1>
+
+  <div class="subtitle">
+    Current PPE stock and inventory movement summary
+  </div>
+
+
+  <!-- ==========================================================
+       SUMMARY CARDS
+       ========================================================== -->
+
+  <div class="cards">
+
+    <div class="card">
+
+      <div class="card-title">
+        Active PPE Items
+      </div>
+
+      <div
+        class="card-value"
+        id="activeItems"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-title">
+        Current Stock
+      </div>
+
+      <div
+        class="card-value"
+        id="currentStock"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-title">
+        Total Received
+      </div>
+
+      <div
+        class="card-value"
+        id="totalReceived"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-title">
+        Total Issued
+      </div>
+
+      <div
+        class="card-value"
+        id="totalIssued"
+      >
+        0
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================================
+       INVENTORY SUMMARY BY PPE ITEM
+       ========================================================== -->
+
+  <div class="section">
+
+    <h2>
+      Inventory Summary by PPE Item
+    </h2>
+
+
+    <div class="filter-row">
+
+      <input
+        type="text"
+        id="inventorySummarySearch"
+        placeholder="Search PPE Item..."
+        oninput="filterInventorySummary()"
+      >
+
+
+      <select
+        id="inventorySummaryStatusFilter"
+        onchange="filterInventorySummary()"
+      >
+
+        <option value="ALL">
+          All Stock Status
+        </option>
+
+        <option value="IN STOCK">
+          In Stock
+        </option>
+
+        <option value="LOW STOCK">
+          Low Stock
+        </option>
+
+        <option value="OUT OF STOCK">
+          Out of Stock
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div
+      id="inventorySummaryContainer"
+      class="table-wrapper"
+    >
+
+      <div class="loading">
+        Loading summary...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================================
+       INVENTORY ITEM DETAILS
+       ========================================================== -->
+
+  <div
+    id="inventoryItemDetails"
+    class="section detail-section"
+  >
+
+    <h2 id="inventoryItemDetailsTitle">
+      PPE Item Details
+    </h2>
+
+
+    <div
+      id="inventoryItemDetailsContainer"
+    >
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================================
+       CURRENT PPE STOCK
+       ========================================================== -->
+
+  <div class="section">
+
+    <h2>
+      Current PPE Stock
+    </h2>
+
+
+    <div class="filter-row">
+
+      <input
+        type="text"
+        id="inventorySearch"
+        placeholder="Search PPE Item or Item No..."
+        oninput="filterInventory()"
+      >
+
+
+      <select
+        id="inventoryStatusFilter"
+        onchange="filterInventory()"
+      >
+
+        <option value="ALL">
+          All Stock Status
+        </option>
+
+        <option value="IN STOCK">
+          In Stock
+        </option>
+
+        <option value="LOW STOCK">
+          Low Stock
+        </option>
+
+        <option value="OUT OF STOCK">
+          Out of Stock
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div
+      id="inventoryContainer"
+      class="table-wrapper"
+    >
+
+      <div class="loading">
+        Loading inventory...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================================
+       STOCK ALERTS
+       ========================================================== -->
+
+  <div class="section">
+
+    <h2>
+      Stock Alerts
+    </h2>
+
+
+    <div class="cards">
+
+
+      <div class="card">
+
+        <div class="card-title">
+          Active PPE Items
+        </div>
+
+        <div
+          class="card-value"
+          id="alertActiveItems"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-title">
+          Low Stock
+        </div>
+
+        <div
+          class="card-value"
+          id="alertLowStock"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-title">
+          Out of Stock
+        </div>
+
+        <div
+          class="card-value"
+          id="alertOutOfStock"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-title">
+          Stock Utilization
+        </div>
+
+        <div
+          class="card-value"
+          id="stockUtilization"
+        >
+          0%
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================================
+       INVENTORY OVERVIEW
+       ========================================================== -->
+
+  <div class="section">
+
+    <h2>
+      Inventory Overview
+    </h2>
+
+
+    <div class="cards">
+
+
+      <div class="card">
+
+        <div class="card-title">
+          Total Available Units
+        </div>
+
+        <div
+          class="card-value"
+          id="overviewAvailable"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-title">
+          Total Received
+        </div>
+
+        <div
+          class="card-value"
+          id="overviewReceived"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-title">
+          Total Issued
+        </div>
+
+        <div
+          class="card-value"
+          id="overviewIssued"
+        >
+          0
+        </div>
+
+      </div>
+
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================================
+       LOW STOCK
+       ========================================================== -->
+
+  <div class="section">
+
+    <h2>
+      Low Stock Items
+    </h2>
+
+
+    <div
+      id="lowStockContainer"
+      class="table-wrapper"
+    >
+
+      <div class="loading">
+        Loading...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================================
+       OUT OF STOCK
+       ========================================================== -->
+
+  <div class="section">
+
+    <h2>
+      Out of Stock Items
+    </h2>
+
+
+    <div
+      id="outOfStockContainer"
+      class="table-wrapper"
+    >
+
+      <div class="loading">
+        Loading...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================================
+       INVENTORY MOVEMENT SUMMARY
+       ========================================================== -->
+
+  <div class="section">
+
+    <h2>
+      Inventory Movement Summary
+    </h2>
+
+
+    <div class="cards">
+
+
+      <div class="card">
+
+        <div class="card-title">
+          Total Received
+        </div>
+
+        <div
+          class="card-value"
+          id="movementReceived"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-title">
+          Total Issued
+        </div>
+
+        <div
+          class="card-value"
+          id="movementIssued"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-title">
+          Net Movement
+        </div>
+
+        <div
+          class="card-value"
+          id="netMovement"
+        >
+          0
+        </div>
+
+      </div>
+
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================================
+       RECENT INVENTORY TRANSACTIONS
+       ========================================================== -->
+
+  <div class="section">
+
+    <h2>
+      Recent Inventory Transactions
+    </h2>
+
+
+    <div class="filter-row">
+
+      <input
+        type="text"
+        id="transactionSearch"
+        placeholder="Search Item, PPE Item, Reference ID, Employee Name or Requestor..."
+        oninput="filterTransactions()"
+      >
+
+
+      <select
+        id="transactionTypeFilter"
+        onchange="filterTransactions()"
+      >
+
+        <option value="ALL">
+          All Transactions
+        </option>
+
+        <option value="STOCK RECEIPT">
+          Stock Receipt
+        </option>
+
+        <option value="ISSUANCE">
+          Issuance
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div
+      id="transactionContainer"
+      class="table-wrapper"
+    >
+
+      <div class="loading">
+        Loading transactions...
+      </div>
+
+    </div>
+
+  </div>
+
+
+</div>
+
+
+<script>
+
+  /*
+   * ==========================================================
+   * PAGINATION SETTINGS
+   * ==========================================================
+   */
+
+  const INVENTORY_DASHBOARD_PAGE_SIZE = 10;
+  const INVENTORY_TRANSACTION_HISTORY_PAGE_SIZE = 10;
+
+
+  let inventoryDashboardState = {
+
+    data: null,
+
+    summaryPage: 1,
+
+    inventoryPage: 1,
+
+    transactionPage: 1
+
+  };
+
+
+  /*
+   * ==========================================================
+   * LOAD DASHBOARD
+   * ==========================================================
+   */
+
+  function loadDashboard() {
+
+    const refreshButton =
+      document.getElementById(
+        'inventoryDashboardRefreshButton'
+      );
+
+
+    if (refreshButton) {
+
+      refreshButton.disabled = true;
+
+      refreshButton.textContent =
+        'Loading...';
+
+    }
+
+
+    document.getElementById(
+      'inventoryContainer'
+    ).innerHTML =
+      '<div class="loading">Loading inventory...</div>';
+
+
+    document.getElementById(
+      'inventorySummaryContainer'
+    ).innerHTML =
+      '<div class="loading">Loading summary...</div>';
+
+
+    document.getElementById(
+      'transactionContainer'
+    ).innerHTML =
+      '<div class="loading">Loading transactions...</div>';
+
+
+    google.script.run
+
+      .withSuccessHandler(
+        function(data) {
+
+          inventoryDashboardState.data =
+            data;
+
+          inventoryDashboardState.summaryPage =
+            1;
+
+          inventoryDashboardState.inventoryPage =
+            1;
+
+          inventoryDashboardState.transactionPage =
+            1;
+
+
+          renderDashboard(data);
+
+
+          if (refreshButton) {
+
+            refreshButton.disabled =
+              false;
+
+            refreshButton.textContent =
+              'Refresh';
+
+          }
+
+        }
+      )
+
+      .withFailureHandler(
+        function(error) {
+
+          const message =
+            error &&
+            error.message
+              ? error.message
+              : String(error);
+
+
+          document.getElementById(
+            'inventoryContainer'
+          ).innerHTML =
+            '<div class="loading">' +
+            escapeHtml(message) +
+            '</div>';
+
+
+          document.getElementById(
+            'inventorySummaryContainer'
+          ).innerHTML =
+            '<div class="loading">' +
+            escapeHtml(message) +
+            '</div>';
+
+
+          document.getElementById(
+            'transactionContainer'
+          ).innerHTML =
+            '<div class="loading">' +
+            escapeHtml(message) +
+            '</div>';
+
+
+          if (refreshButton) {
+
+            refreshButton.disabled =
+              false;
+
+            refreshButton.textContent =
+              'Refresh';
+
+          }
+
+        }
+      )
+
+      .getInventoryDashboardData();
+
+  }
+
+
+  /*
+   * ==========================================================
+   * RENDER DASHBOARD
+   * ==========================================================
+   */
+
+  function renderDashboard(data) {
+
+    document.getElementById(
+      'activeItems'
+    ).textContent =
+      Number(data.activeItems) || 0;
+
+
+    document.getElementById(
+      'currentStock'
+    ).textContent =
+      Number(data.currentStock) || 0;
+
+
+    document.getElementById(
+      'totalReceived'
+    ).textContent =
+      Number(data.totalReceived) || 0;
+
+
+    document.getElementById(
+      'totalIssued'
+    ).textContent =
+      Number(data.totalIssued) || 0;
+
+
+    renderInventorySummary(
+      data.inventorySummary || []
+    );
+
+
+    renderInventory(
+      data.inventory || []
+    );
+
+
+    renderLowStock(
+      data.lowStock || []
+    );
+
+
+    renderOutOfStock(
+      data.outOfStock || []
+    );
+
+
+    document.getElementById(
+      'alertActiveItems'
+    ).textContent =
+      Number(data.activeItems) || 0;
+
+
+    document.getElementById(
+      'alertLowStock'
+    ).textContent =
+      (data.lowStock || []).length;
+
+
+    document.getElementById(
+      'alertOutOfStock'
+    ).textContent =
+      (data.outOfStock || []).length;
+
+
+    const totalMovement =
+      (
+        Number(data.totalReceived) || 0
+      ) +
+      (
+        Number(data.totalIssued) || 0
+      );
+
+
+    const utilization =
+      totalMovement === 0
+        ? 0
+        : (
+            (
+              Number(data.totalIssued) || 0
+            ) /
+            totalMovement
+          ) *
+          100;
+
+
+    document.getElementById(
+      'stockUtilization'
+    ).textContent =
+      utilization.toFixed(1) +
+      '%';
+
+
+    document.getElementById(
+      'overviewAvailable'
+    ).textContent =
+      Number(data.currentStock) || 0;
+
+
+    document.getElementById(
+      'overviewReceived'
+    ).textContent =
+      Number(data.totalReceived) || 0;
+
+
+    document.getElementById(
+      'overviewIssued'
+    ).textContent =
+      Number(data.totalIssued) || 0;
+
+
+    document.getElementById(
+      'movementReceived'
+    ).textContent =
+      Number(data.totalReceived) || 0;
+
+
+    document.getElementById(
+      'movementIssued'
+    ).textContent =
+      Number(data.totalIssued) || 0;
+
+
+    document.getElementById(
+      'netMovement'
+    ).textContent =
+      (
+        Number(data.totalReceived) || 0
+      ) -
+      (
+        Number(data.totalIssued) || 0
+      );
+
+
+    document.getElementById(
+      'lastUpdated'
+    ).textContent =
+      'Last updated: ' +
+      new Date().toLocaleString();
+
+
+    renderTransactions(
+      data.transactions || []
+    );
+
+  }
+
+
+  /*
+   * ==========================================================
+   * INVENTORY SUMMARY FILTER
+   * ==========================================================
+   */
+
+  function getFilteredInventorySummary() {
+
+    const data =
+      (
+        inventoryDashboardState.data &&
+        inventoryDashboardState.data.inventorySummary
+      ) || [];
+
+
+    const search =
+      document.getElementById(
+        'inventorySummarySearch'
+      ).value
+      .toLowerCase()
+      .trim();
+
+
+    const statusFilter =
+      document.getElementById(
+        'inventorySummaryStatusFilter'
+      ).value;
+
+
+    return data.filter(
+      function(item) {
+
+        const ppeItem =
+          String(
+            item.ppeItem || ''
+          )
+          .toLowerCase();
+
+
+        let status =
+          '';
+
+
+        if (
+          Number(item.availableQty) <= 0
+        ) {
+
+          status =
+            'OUT OF STOCK';
+
+        } else if (
+          Number(item.availableQty) <= 10
+        ) {
+
+          status =
+            'LOW STOCK';
+
+        } else {
+
+          status =
+            'IN STOCK';
+
+        }
+
+
+        const matchesSearch =
+          ppeItem.includes(
+            search
+          );
+
+
+        const matchesStatus =
+          statusFilter === 'ALL' ||
+          status === statusFilter;
+
+
+        return (
+          matchesSearch &&
+          matchesStatus
+        );
+
+      }
+    );
+
+  }
+
+
+  /*
+   * ==========================================================
+   * INVENTORY SUMMARY RENDER
+   * ==========================================================
+   */
+
+  function renderInventorySummary(
+    items
+  ) {
+
+    const container =
+      document.getElementById(
+        'inventorySummaryContainer'
+      );
+
+
+    const filteredItems =
+      getFilteredInventorySummary();
+
+
+    if (
+      !filteredItems ||
+      filteredItems.length === 0
+    ) {
+
+      container.innerHTML =
+        '<div class="loading">' +
+        'No inventory found.' +
+        '</div>';
+
+      return;
+
+    }
+
+
+    const totalPages =
+      Math.ceil(
+        filteredItems.length /
+        INVENTORY_DASHBOARD_PAGE_SIZE
+      );
+
+
+    let currentPage =
+      inventoryDashboardState.summaryPage;
+
+
+    if (currentPage > totalPages) {
+      currentPage = totalPages;
+    }
+
+    if (currentPage < 1) {
+      currentPage = 1;
+    }
+
+
+    inventoryDashboardState.summaryPage =
+      currentPage;
+
+
+    const startIndex =
+      (
+        currentPage - 1
+      ) *
+      INVENTORY_DASHBOARD_PAGE_SIZE;
+
+
+    const pageItems =
+      filteredItems.slice(
+        startIndex,
+        startIndex +
+        INVENTORY_DASHBOARD_PAGE_SIZE
+      );
+
+
+    let html = `
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>PPE Item</th>
+
+            <th>Unit</th>
+
+            <th class="number">
+              Current Stock
+            </th>
+
+            <th class="number">
+              Total Received
+            </th>
+
+            <th class="number">
+              Total Issued
+            </th>
+
+            <th>Status</th>
+
+            <th>Action</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+    `;
+
+
+    pageItems.forEach(
+      function(item) {
+
+        let status = '';
+        let statusClass = '';
+
+
+        if (
+          Number(item.availableQty) <= 0
+        ) {
+
+          status =
+            'OUT OF STOCK';
+
+          statusClass =
+            'out-of-stock';
+
+        } else if (
+          Number(item.availableQty) <= 10
+        ) {
+
+          status =
+            'LOW STOCK';
+
+          statusClass =
+            'low-stock';
+
+        } else {
+
+          status =
+            'IN STOCK';
+
+          statusClass =
+            'in-stock';
+
+        }
+
+
+        html += `
+
+          <tr>
+
+            <td>
+              ${escapeHtml(
+                item.ppeItem
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                item.unit
+              )}
+            </td>
+
+            <td class="number">
+              ${Number(
+                item.availableQty
+              ) || 0}
+            </td>
+
+            <td class="number">
+              ${Number(
+                item.totalReceived
+              ) || 0}
+            </td>
+
+            <td class="number">
+              ${Number(
+                item.totalIssued
+              ) || 0}
+            </td>
+
+            <td class="${statusClass}">
+              ${status}
+            </td>
+
+            <td>
+
+              <button
+                type="button"
+                class="view-button"
+                onclick="showInventoryItemDetails(
+                  '${escapeJsString(
+                    String(item.itemNo || '')
+                  )}'
+                )"
+              >
+                View
+              </button>
+
+            </td>
+
+          </tr>
+
+        `;
+
+      }
+    );
+
+
+    html += `
+
+        </tbody>
+
+      </table>
+
+    `;
+
+
+    html += buildPagination(
+      filteredItems.length,
+      currentPage,
+      totalPages,
+      'summary'
+    );
+
+
+    container.innerHTML =
+      html;
+
+  }
+
+
+  /*
+   * ==========================================================
+   * INVENTORY SUMMARY SEARCH/FILTER
+   * ==========================================================
+   */
+
+  function filterInventorySummary() {
+
+    inventoryDashboardState.summaryPage =
+      1;
+
+
+    renderInventorySummary(
+      (
+        inventoryDashboardState.data &&
+        inventoryDashboardState.data.inventorySummary
+      ) || []
+    );
+
+  }
+
+
+  /*
+   * ==========================================================
+   * CURRENT INVENTORY FILTER
+   * ==========================================================
+   */
+
+  function getFilteredInventory() {
+
+    const data =
+      (
+        inventoryDashboardState.data &&
+        inventoryDashboardState.data.inventory
+      ) || [];
+
+
+    const search =
+      document.getElementById(
+        'inventorySearch'
+      ).value
+      .toLowerCase()
+      .trim();
+
+
+    const statusFilter =
+      document.getElementById(
+        'inventoryStatusFilter'
+      ).value;
+
+
+    return data.filter(
+      function(item) {
+
+        const itemNo =
+          String(
+            item.itemNo || ''
+          )
+          .toLowerCase();
+
+
+        const ppeItem =
+          String(
+            item.ppeItem || ''
+          )
+          .toLowerCase();
+
+
+        let status =
+          '';
+
+
+        if (
+          Number(item.availableQty) <= 0
+        ) {
+
+          status =
+            'OUT OF STOCK';
+
+        } else if (
+          Number(item.availableQty) <= 10
+        ) {
+
+          status =
+            'LOW STOCK';
+
+        } else {
+
+          status =
+            'IN STOCK';
+
+        }
+
+
+        const matchesSearch =
+          itemNo.includes(search) ||
+          ppeItem.includes(search);
+
+
+        const matchesStatus =
+          statusFilter === 'ALL' ||
+          status === statusFilter;
+
+
+        return (
+          matchesSearch &&
+          matchesStatus
+        );
+
+      }
+    );
+
+  }
+
+
+  /*
+   * ==========================================================
+   * CURRENT INVENTORY RENDER
+   * ==========================================================
+   */
+
+  function renderInventory(
+    items
+  ) {
+
+    const container =
+      document.getElementById(
+        'inventoryContainer'
+      );
+
+
+    const filteredItems =
+      getFilteredInventory();
+
+
+    if (
+      !filteredItems ||
+      filteredItems.length === 0
+    ) {
+
+      container.innerHTML =
+        '<div class="loading">' +
+        'No inventory found.' +
+        '</div>';
+
+      return;
+
+    }
+
+
+    const totalPages =
+      Math.ceil(
+        filteredItems.length /
+        INVENTORY_DASHBOARD_PAGE_SIZE
+      );
+
+
+    let currentPage =
+      inventoryDashboardState.inventoryPage;
+
+
+    if (currentPage > totalPages) {
+      currentPage = totalPages;
+    }
+
+    if (currentPage < 1) {
+      currentPage = 1;
+    }
+
+
+    inventoryDashboardState.inventoryPage =
+      currentPage;
+
+
+    const startIndex =
+      (
+        currentPage - 1
+      ) *
+      INVENTORY_DASHBOARD_PAGE_SIZE;
+
+
+    const pageItems =
+      filteredItems.slice(
+        startIndex,
+        startIndex +
+        INVENTORY_DASHBOARD_PAGE_SIZE
+      );
+
+
+    let html = `
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Item No</th>
+
+            <th>PPE Item</th>
+
+            <th>Unit</th>
+
+            <th class="number">
+              Available Qty
+            </th>
+
+            <th>Status</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+    `;
+
+
+    pageItems.forEach(
+      function(item) {
+
+        let status = '';
+        let statusClass = '';
+
+
+        if (
+          Number(item.availableQty) <= 0
+        ) {
+
+          status =
+            'OUT OF STOCK';
+
+          statusClass =
+            'out-of-stock';
+
+        } else if (
+          Number(item.availableQty) <= 10
+        ) {
+
+          status =
+            'LOW STOCK';
+
+          statusClass =
+            'low-stock';
+
+        } else {
+
+          status =
+            'IN STOCK';
+
+          statusClass =
+            'in-stock';
+
+        }
+
+
+        html += `
+
+          <tr>
+
+            <td>
+              ${escapeHtml(
+                item.itemNo
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                item.ppeItem
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                item.unit
+              )}
+            </td>
+
+            <td class="number">
+              ${Number(
+                item.availableQty
+              ) || 0}
+            </td>
+
+            <td class="${statusClass}">
+              ${status}
+            </td>
+
+          </tr>
+
+        `;
+
+      }
+    );
+
+
+    html += `
+
+        </tbody>
+
+      </table>
+
+    `;
+
+
+    html += buildPagination(
+      filteredItems.length,
+      currentPage,
+      totalPages,
+      'inventory'
+    );
+
+
+    container.innerHTML =
+      html;
+
+  }
+
+
+  /*
+   * ==========================================================
+   * CURRENT INVENTORY SEARCH/FILTER
+   * ==========================================================
+   */
+
+  function filterInventory() {
+
+    inventoryDashboardState.inventoryPage =
+      1;
+
+
+    renderInventory(
+      (
+        inventoryDashboardState.data &&
+        inventoryDashboardState.data.inventory
+      ) || []
+    );
+
+  }
+
+
+  /*
+   * ==========================================================
+   * PAGINATION
+   * ==========================================================
+   */
+
+  function buildPagination(
+    totalRows,
+    currentPage,
+    totalPages,
+    type
+  ) {
+
+    const startRow =
+      totalRows === 0
+        ? 0
+        : (
+            (
+              currentPage - 1
+            ) *
+            INVENTORY_DASHBOARD_PAGE_SIZE
+          ) +
+          1;
+
+
+    const endRow =
+      Math.min(
+        currentPage *
+        INVENTORY_DASHBOARD_PAGE_SIZE,
+        totalRows
+      );
+
+
+    let html = `
+
+      <div class="pagination">
+
+        <div class="pagination-info">
+
+          Showing
+          ${startRow}
+          –
+          ${endRow}
+          of
+          ${totalRows}
+
+        </div>
+
+        <div class="pagination-buttons">
+
+    `;
+
+
+    html += `
+
+      <button
+        type="button"
+        class="page-btn"
+        onclick="changeDashboardPage(
+          '${type}',
+          ${currentPage - 1}
+        )"
+        ${currentPage <= 1 ? 'disabled' : ''}
+      >
+        Previous
+      </button>
+
+    `;
+
+
+    let startPage =
+      Math.max(
+        1,
+        currentPage - 2
+      );
+
+
+    let endPage =
+      Math.min(
+        totalPages,
+        startPage + 4
+      );
+
+
+    if (
+      endPage - startPage < 4
+    ) {
+
+      startPage =
+        Math.max(
+          1,
+          endPage - 4
+        );
+
+    }
+
+
+    for (
+      let page = startPage;
+      page <= endPage;
+      page++
+    ) {
+
+      html += `
+
+        <button
+          type="button"
+          class="page-btn ${
+            page === currentPage
+              ? 'active'
+              : ''
+          }"
+          onclick="changeDashboardPage(
+            '${type}',
+            ${page}
+          )"
+        >
+          ${page}
+        </button>
+
+      `;
+
+    }
+
+
+    html += `
+
+      <button
+        type="button"
+        class="page-btn"
+        onclick="changeDashboardPage(
+          '${type}',
+          ${currentPage + 1}
+        )"
+        ${
+          currentPage >= totalPages
+            ? 'disabled'
+            : ''
+        }
+      >
+        Next
+      </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    return html;
+
+  }
+
+
+  function changeDashboardPage(
+    type,
+    page
+  ) {
+
+    if (type === 'summary') {
+
+      inventoryDashboardState.summaryPage =
+        page;
+
+      renderInventorySummary(
+        (
+          inventoryDashboardState.data &&
+          inventoryDashboardState.data.inventorySummary
+        ) || []
+      );
+
+
+    } else if (
+      type === 'inventory'
+    ) {
+
+      inventoryDashboardState.inventoryPage =
+        page;
+
+      renderInventory(
+        (
+          inventoryDashboardState.data &&
+          inventoryDashboardState.data.inventory
+        ) || []
+      );
+
+
+    } else if (
+      type === 'transactions'
+    ) {
+
+      inventoryDashboardState.transactionPage =
+        page;
+
+      renderTransactions(
+        (
+          inventoryDashboardState.data &&
+          inventoryDashboardState.data.transactions
+        ) || []
+      );
+
+    }
+
+  }
+
+
+
+/*
+ * ==========================================================
+ * ITEM DETAILS
+ * ==========================================================
+ */
+
+function showInventoryItemDetails(
+  itemNo
+) {
+
+  console.log(
+    'VIEW ITEM:',
+    itemNo
+  );
+
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(data) {
+
+        console.log(
+          'SERVER DATA:',
+          data
+        );
+
+
+        if (!data) {
+
+          alert(
+            'No inventory data returned for Item No: ' +
+            itemNo
+          );
+
+          return;
+
+        }
+
+
+        document.getElementById(
+          'inventoryItemDetails'
+        ).style.display =
+          'block';
+
+
+        document.getElementById(
+          'inventoryItemDetailsTitle'
+        ).textContent =
+          String(
+            data.ppeItem || ''
+          ) +
+          ' - Details';
+
+
+        /*
+         * ======================================================
+         * BUILD BASIC ITEM DETAILS
+         * ======================================================
+         */
+
+        let html = `
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Item No
+                </th>
+
+                <th>
+                  PPE Item
+                </th>
+
+                <th>
+                  Unit
+                </th>
+
+                <th class="number">
+                  Current Stock
+                </th>
+
+                <th class="number">
+                  Total Received
+                </th>
+
+                <th class="number">
+                  Total Issued
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr>
+
+                <td>
+                  ${escapeHtml(
+                    String(
+                      data.itemNo || ''
+                    )
+                  )}
+                </td>
+
+                <td>
+                  ${escapeHtml(
+                    String(
+                      data.ppeItem || ''
+                    )
+                  )}
+                </td>
+
+                <td>
+                  ${escapeHtml(
+                    String(
+                      data.unit || ''
+                    )
+                  )}
+                </td>
+
+                <td class="number">
+                  ${
+                    Number(
+                      data.availableQty
+                    ) || 0
+                  }
+                </td>
+
+                <td class="number">
+                  ${
+                    Number(
+                      data.totalReceived
+                    ) || 0
+                  }
+                </td>
+
+                <td class="number">
+                  ${
+                    Number(
+                      data.totalIssued
+                    ) || 0
+                  }
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+
+          <h3
+            style="margin-top: 25px;"
+          >
+            Transaction History
+          </h3>
+
+        `;
+
+
+        /*
+         * ======================================================
+         * TRANSACTION HISTORY DATA
+         * ======================================================
+         */
+
+        const historyItems =
+          (data.transactionHistory || []).slice().sort(
+            function(a, b) {
+
+              return new Date(b.date) - new Date(a.date);
+
+            }
+          );
+
+
+        /*
+         * ======================================================
+         * NO TRANSACTION HISTORY
+         * ======================================================
+         */
+
+        if (
+          historyItems.length === 0
+        ) {
+
+          html += `
+
+            <div class="table-wrapper">
+
+              <table>
+
+                <thead>
+
+                  <tr>
+
+                    <th>
+                      Date
+                    </th>
+
+                    <th>
+                      Type
+                    </th>
+
+                    <th class="number">
+                      Quantity
+                    </th>
+
+                    <th class="number">
+                      Balance
+                    </th>
+
+                    <th>
+                      Reference
+                    </th>
+
+                    <th>
+                      Employee Name
+                    </th>
+
+                    <th>
+                      Requestor
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody>
+
+                  <tr>
+
+                    <td
+                      colspan="7"
+                      style="text-align:center;"
+                    >
+                      No transaction history found.
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          `;
+
+
+        } else {
+
+
+          /*
+           * ====================================================
+           * TRANSACTION HISTORY CONTAINER
+           * ====================================================
+           */
+
+          html += `
+
+            <div
+              id="inventoryTransactionHistoryTable"
+              class="table-wrapper"
+            >
+            </div>
+
+          `;
+
+
+          /*
+           * ====================================================
+           * TRANSACTION HISTORY PAGINATION CONTAINER
+           * ====================================================
+           */
+
+          html += `
+
+            <div
+              id="inventoryTransactionHistoryPagination"
+            >
+            </div>
+
+          `;
+
+        }
+
+
+        /*
+         * ======================================================
+         * CLOSE BUTTON
+         * ======================================================
+         */
+
+        html += `
+
+          <div class="detail-close-area">
+
+            <button
+              type="button"
+              onclick="closeInventoryItemDetails()"
+              class="detail-close-button"
+            >
+              Close Details
+            </button>
+
+          </div>
+
+        `;
+
+
+        /*
+         * ======================================================
+         * DISPLAY DETAILS
+         * ======================================================
+         */
+
+        document.getElementById(
+          'inventoryItemDetailsContainer'
+        ).innerHTML =
+          html;
+
+
+        /*
+         * ======================================================
+         * TRANSACTION HISTORY PAGINATION
+         * ======================================================
+         */
+
+        if (
+          historyItems.length > 0
+        ) {
+
+          const pageSize =
+            INVENTORY_TRANSACTION_HISTORY_PAGE_SIZE;
+
+
+          let currentPage =
+            1;
+
+
+          function renderHistoryPage(
+            page
+          ) {
+
+            const totalPages =
+              Math.ceil(
+                historyItems.length /
+                pageSize
+              );
+
+
+            if (page < 1) {
+
+              page = 1;
+
+            }
+
+
+            if (page > totalPages) {
+
+              page = totalPages;
+
+            }
+
+
+            currentPage =
+              page;
+
+
+            const startIndex =
+              (
+                currentPage - 1
+              ) *
+              pageSize;
+
+
+            const pageItems =
+              historyItems.slice(
+                startIndex,
+                startIndex +
+                pageSize
+              );
+
+
+            /*
+             * ==================================================
+             * BUILD HISTORY TABLE
+             * ==================================================
+             */
+
+            let tableHtml = `
+
+              <table>
+
+                <thead>
+
+                  <tr>
+
+                    <th>
+                      Date
+                    </th>
+
+                    <th>
+                      Type
+                    </th>
+
+                    <th class="number">
+                      Quantity
+                    </th>
+
+                    <th class="number">
+                      Balance
+                    </th>
+
+                    <th>
+                      Reference
+                    </th>
+
+                    <th>
+                      Employee Name
+                    </th>
+
+                    <th>
+                      Requestor
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody>
+
+            `;
+
+
+            pageItems.forEach(
+              function(tx) {
+
+                const txType =
+                  String(
+                    tx.type || ''
+                  );
+
+
+                const txTypeUpper =
+                  txType.toUpperCase();
+
+
+                let txClass =
+                  '';
+
+
+                if (
+                  txTypeUpper ===
+                  'STOCK RECEIPT'
+                ) {
+
+                  txClass =
+                    'transaction-receipt';
+
+
+                } else if (
+                  txTypeUpper ===
+                  'ISSUANCE'
+                ) {
+
+                  txClass =
+                    'transaction-issuance';
+
+                }
+
+
+                tableHtml += `
+
+                  <tr>
+
+                    <td>
+                      ${
+                        formatInventoryTransactionDate(
+                          tx.date
+                        )
+                      }
+                    </td>
+
+                    <td>
+
+                      <span
+                        class="${txClass}"
+                      >
+
+                        ${
+                          escapeHtml(
+                            txType
+                          )
+                        }
+
+                      </span>
+
+                    </td>
+
+                    <td class="number">
+                      ${
+                        Number(
+                          tx.quantity
+                        ) || 0
+                      }
+                    </td>
+
+                    <td class="number">
+                      ${
+                        Number(
+                          tx.balance
+                        ) || 0
+                      }
+                    </td>
+
+                    <td>
+                      ${
+                        escapeHtml(
+                          String(
+                            tx.reference || ''
+                          )
+                        )
+                      }
+                    </td>
+
+                    <td>
+                      ${
+                        escapeHtml(
+                          String(
+                            tx.employeeName || ''
+                          )
+                        )
+                      }
+                    </td>
+
+                    <td>
+                      ${
+                        escapeHtml(
+                          String(
+                            tx.requestorName || ''
+                          )
+                        )
+                      }
+                    </td>
+
+                  </tr>
+
+                `;
+
+              }
+            );
+
+
+            tableHtml += `
+
+                </tbody>
+
+              </table>
+
+            `;
+
+
+            /*
+             * ==================================================
+             * UPDATE TABLE
+             * ==================================================
+             */
+
+            document.getElementById(
+              'inventoryTransactionHistoryTable'
+            ).innerHTML =
+              tableHtml;
+
+
+            /*
+             * ==================================================
+             * PAGINATION INFO
+             * ==================================================
+             */
+
+            const startRow =
+              (
+                currentPage - 1
+              ) *
+              pageSize +
+              1;
+
+
+            const endRow =
+              Math.min(
+                currentPage * pageSize,
+                historyItems.length
+              );
+
+
+            let paginationHtml = `
+
+              <div class="pagination">
+
+                <div class="pagination-info">
+
+                  Showing
+                  ${startRow}
+                  –
+                  ${endRow}
+                  of
+                  ${historyItems.length}
+
+                </div>
+
+                <div class="pagination-buttons">
+
+                  <button
+                    type="button"
+                    id="inventoryHistoryPreviousButton"
+                    class="page-btn"
+                    ${currentPage <= 1 ? 'disabled' : ''}
+                  >
+                    Previous
+                  </button>
+
+            `;
+
+
+            let startPage =
+              Math.max(
+                1,
+                currentPage - 2
+              );
+
+
+            let endPage =
+              Math.min(
+                totalPages,
+                startPage + 4
+              );
+
+
+            if (
+              endPage - startPage < 4
+            ) {
+
+              startPage =
+                Math.max(
+                  1,
+                  endPage - 4
+                );
+
+            }
+
+
+            for (
+              let pageNumber = startPage;
+              pageNumber <= endPage;
+              pageNumber++
+            ) {
+
+              paginationHtml += `
+
+                <button
+                  type="button"
+                  class="page-btn ${
+                    pageNumber === currentPage
+                      ? 'active'
+                      : ''
+                  }"
+                  data-history-page="${pageNumber}"
+                >
+                  ${pageNumber}
+                </button>
+
+              `;
+
+            }
+
+
+            paginationHtml += `
+
+                  <button
+                    type="button"
+                    id="inventoryHistoryNextButton"
+                    class="page-btn"
+                    ${
+                      currentPage >= totalPages
+                        ? 'disabled'
+                        : ''
+                    }
+                  >
+                    Next
+                  </button>
+
+                </div>
+
+              </div>
+
+            `;
+
+
+            /*
+             * ==================================================
+             * UPDATE PAGINATION
+             * ==================================================
+             */
+
+            const paginationContainer =
+              document.getElementById(
+                'inventoryTransactionHistoryPagination'
+              );
+
+
+            paginationContainer.innerHTML =
+              paginationHtml;
+
+
+            /*
+             * ==================================================
+             * PREVIOUS BUTTON
+             * ==================================================
+             */
+
+            const previousButton =
+              document.getElementById(
+                'inventoryHistoryPreviousButton'
+              );
+
+
+            if (previousButton) {
+
+              previousButton.onclick =
+                function() {
+
+                  renderHistoryPage(
+                    currentPage - 1
+                  );
+
+                };
+
+            }
+
+
+            /*
+             * ==================================================
+             * NEXT BUTTON
+             * ==================================================
+             */
+
+            const nextButton =
+              document.getElementById(
+                'inventoryHistoryNextButton'
+              );
+
+
+            if (nextButton) {
+
+              nextButton.onclick =
+                function() {
+
+                  renderHistoryPage(
+                    currentPage + 1
+                  );
+
+                };
+
+            }
+
+
+            /*
+             * ==================================================
+             * PAGE NUMBER BUTTONS
+             * ==================================================
+             */
+
+            const pageButtons =
+              paginationContainer.querySelectorAll(
+                '[data-history-page]'
+              );
+
+
+            pageButtons.forEach(
+              function(button) {
+
+                button.onclick =
+                  function() {
+
+                    renderHistoryPage(
+                      Number(
+                        button.getAttribute(
+                          'data-history-page'
+                        )
+                      )
+                    );
+
+                  };
+
+              }
+            );
+
+          }
+
+
+          /*
+           * ====================================================
+           * INITIAL PAGE
+           * ====================================================
+           */
+
+          renderHistoryPage(
+            1
+          );
+
+        }
+
+
+        /*
+         * ======================================================
+         * SCROLL TO DETAILS
+         * ======================================================
+         */
+
+        document.getElementById(
+          'inventoryItemDetails'
+        ).scrollIntoView({
+          behavior: 'smooth'
+        });
+
+
+      }
+    )
+
+    .withFailureHandler(
+      function(error) {
+
+        console.error(
+          'Inventory Details Error:',
+          error
+        );
+
+
+        alert(
+          'Error loading item details: ' +
+          (
+            error &&
+            error.message
+              ? error.message
+              : error
+          )
+        );
+
+      }
+    )
+
+    .getInventoryItemDetails(
+      String(itemNo)
+    );
+
+}
+
+
+
+
+  /*
+   * ==========================================================
+   * CLOSE DETAILS
+   * ==========================================================
+   */
+
+  function closeInventoryItemDetails() {
+
+    const section =
+      document.getElementById(
+        'inventoryItemDetails'
+      );
+
+
+    if (section) {
+
+      section.style.display =
+        'none';
+
+    }
+
+  }
+
+
+  /*
+   * ==========================================================
+   * LOW STOCK
+   * ==========================================================
+   */
+
+  function renderLowStock(
+    items
+  ) {
+
+    const container =
+      document.getElementById(
+        'lowStockContainer'
+      );
+
+
+    if (
+      !items ||
+      items.length === 0
+    ) {
+
+      container.innerHTML =
+        '<div class="loading">' +
+        'No low-stock items.' +
+        '</div>';
+
+      return;
+
+    }
+
+
+    let html = `
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Item No
+            </th>
+
+            <th>
+              PPE Item
+            </th>
+
+            <th>
+              Unit
+            </th>
+
+            <th class="number">
+              Available Qty
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+    `;
+
+
+    items.forEach(
+      function(item) {
+
+        html += `
+
+          <tr>
+
+            <td>
+              ${escapeHtml(
+                item.itemNo
+              )}
+            </td>
+
+            <td class="low-stock">
+              ${escapeHtml(
+                item.ppeItem
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                item.unit
+              )}
+            </td>
+
+            <td class="number">
+              ${
+                Number(
+                  item.availableQty
+                ) || 0
+              }
+            </td>
+
+          </tr>
+
+        `;
+
+      }
+    );
+
+
+    html += `
+
+        </tbody>
+
+      </table>
+
+    `;
+
+
+    container.innerHTML =
+      html;
+
+  }
+
+
+  /*
+   * ==========================================================
+   * OUT OF STOCK
+   * ==========================================================
+   */
+
+  function renderOutOfStock(
+    items
+  ) {
+
+    const container =
+      document.getElementById(
+        'outOfStockContainer'
+      );
+
+
+    if (
+      !items ||
+      items.length === 0
+    ) {
+
+      container.innerHTML =
+        '<div class="loading">' +
+        'No out-of-stock items.' +
+        '</div>';
+
+      return;
+
+    }
+
+
+    let html = `
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Item No
+            </th>
+
+            <th>
+              PPE Item
+            </th>
+
+            <th>
+              Unit
+            </th>
+
+            <th class="number">
+              Available Qty
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+    `;
+
+
+    items.forEach(
+      function(item) {
+
+        html += `
+
+          <tr>
+
+            <td>
+              ${escapeHtml(
+                item.itemNo
+              )}
+            </td>
+
+            <td class="out-of-stock">
+              ${escapeHtml(
+                item.ppeItem
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                item.unit
+              )}
+            </td>
+
+            <td class="number">
+              ${
+                Number(
+                  item.availableQty
+                ) || 0
+              }
+            </td>
+
+          </tr>
+
+        `;
+
+      }
+    );
+
+
+    html += `
+
+        </tbody>
+
+      </table>
+
+    `;
+
+
+    container.innerHTML =
+      html;
+
+  }
+
+
+  /*
+   * ==========================================================
+   * TRANSACTION FILTER
+   * ==========================================================
+   */
+
+  function getFilteredTransactions() {
+
+    const data =
+      (
+        inventoryDashboardState.data &&
+        inventoryDashboardState.data.transactions
+      ) || [];
+
+
+    const search =
+      document.getElementById(
+        'transactionSearch'
+      ).value
+      .toLowerCase()
+      .trim();
+
+
+    const typeFilter =
+      document.getElementById(
+        'transactionTypeFilter'
+      ).value;
+
+
+    return data.filter(
+      function(tx) {
+
+        const type =
+          String(
+            tx.type || ''
+          )
+          .toLowerCase();
+
+
+        const ppeItem =
+          String(
+            tx.ppeItem || ''
+          )
+          .toLowerCase();
+
+
+        const unit =
+          String(
+            tx.unit || ''
+          )
+          .toLowerCase();
+
+
+        const reference =
+          String(
+            tx.reference || ''
+          )
+          .toLowerCase();
+
+
+        const employeeName =
+          String(
+            tx.employeeName || ''
+          )
+          .toLowerCase();
+
+
+        const requestorName =
+          String(
+            tx.requestorName || ''
+          )
+          .toLowerCase();
+
+
+        const matchesSearch =
+          ppeItem.includes(search) ||
+          reference.includes(search) ||
+          employeeName.includes(search) ||
+          requestorName.includes(search) ||
+          type.includes(search) ||
+          unit.includes(search);
+
+
+        const matchesType =
+          typeFilter === 'ALL' ||
+          String(
+            tx.type || ''
+          )
+          .toUpperCase()
+          ===
+          typeFilter;
+
+
+        return (
+          matchesSearch &&
+          matchesType
+        );
+
+      }
+    );
+
+  }
+
+
+  /*
+   * ==========================================================
+   * TRANSACTIONS RENDER
+   * ==========================================================
+   */
+
+  function renderTransactions(
+    items
+  ) {
+
+    const container =
+      document.getElementById(
+        'transactionContainer'
+      );
+
+
+    const filteredItems =
+      getFilteredTransactions();
+
+
+    if (
+      !filteredItems ||
+      filteredItems.length === 0
+    ) {
+
+      container.innerHTML = `
+
+        <div class="loading">
+          No transactions found.
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    const totalPages =
+      Math.ceil(
+        filteredItems.length /
+        INVENTORY_DASHBOARD_PAGE_SIZE
+      );
+
+
+    let currentPage =
+      inventoryDashboardState.transactionPage;
+
+
+    if (
+      currentPage > totalPages
+    ) {
+
+      currentPage =
+        totalPages;
+
+    }
+
+
+    if (
+      currentPage < 1
+    ) {
+
+      currentPage =
+        1;
+
+    }
+
+
+    inventoryDashboardState.transactionPage =
+      currentPage;
+
+
+    const startIndex =
+      (
+        currentPage - 1
+      ) *
+      INVENTORY_DASHBOARD_PAGE_SIZE;
+
+
+    const pageItems =
+      filteredItems.slice(
+        startIndex,
+        startIndex +
+        INVENTORY_DASHBOARD_PAGE_SIZE
+      );
+
+
+    let html = `
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Date
+            </th>
+
+            <th>
+              Type
+            </th>
+
+            <th>
+              PPE Item
+            </th>
+
+            <th>
+              Unit
+            </th>
+
+            <th class="number">
+              Quantity
+            </th>
+
+            <th class="number">
+              Balance
+            </th>
+
+            <th>
+              Reference
+            </th>
+
+            <th>
+              Employee Name
+            </th>
+
+            <th>
+              Requestor
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+    `;
+
+
+    pageItems.forEach(
+      function(tx) {
+
+        const transactionType =
+          String(
+            tx.type || ''
+          )
+          .toUpperCase();
+
+
+        let typeClass =
+          '';
+
+
+        if (
+          transactionType ===
+          'STOCK RECEIPT'
+        ) {
+
+          typeClass =
+            'transaction-receipt';
+
+        } else if (
+          transactionType ===
+          'ISSUANCE'
+        ) {
+
+          typeClass =
+            'transaction-issuance';
+
+        }
+
+
+        html += `
+
+          <tr>
+
+            <td>
+              ${
+                formatInventoryTransactionDate(
+                  tx.date
+                )
+              }
+            </td>
+
+            <td>
+
+              <span
+                class="${typeClass}"
+              >
+                ${
+                  escapeHtml(
+                    String(
+                      tx.type || ''
+                    )
+                  )
+                }
+              </span>
+
+            </td>
+
+            <td>
+              ${
+                escapeHtml(
+                  String(
+                    tx.ppeItem || ''
+                  )
+                )
+              }
+            </td>
+
+            <td>
+              ${
+                escapeHtml(
+                  String(
+                    tx.unit || ''
+                  )
+                )
+              }
+            </td>
+
+            <td class="number">
+              ${
+                Number(
+                  tx.quantity
+                ) || 0
+              }
+            </td>
+
+            <td class="number">
+              ${
+                Number(
+                  tx.balance
+                ) || 0
+              }
+            </td>
+
+            <td>
+              ${
+                escapeHtml(
+                  String(
+                    tx.reference || ''
+                  )
+                )
+              }
+            </td>
+
+            <td>
+              ${
+                escapeHtml(
+                  String(
+                    tx.employeeName || ''
+                  )
+                )
+              }
+            </td>
+
+            <td>
+              ${
+                escapeHtml(
+                  String(
+                    tx.requestorName || ''
+                  )
+                )
+              }
+            </td>
+
+          </tr>
+
+        `;
+
+      }
+    );
+
+
+    html += `
+
+        </tbody>
+
+      </table>
+
+    `;
+
+
+    html += buildPagination(
+      filteredItems.length,
+      currentPage,
+      totalPages,
+      'transactions'
+    );
+
+
+    container.innerHTML =
+      html;
+
+  }
+
+
+  /*
+   * ==========================================================
+   * TRANSACTION SEARCH/FILTER
+   * ==========================================================
+   */
+
+  function filterTransactions() {
+
+    inventoryDashboardState.transactionPage =
+      1;
+
+
+    renderTransactions(
+      (
+        inventoryDashboardState.data &&
+        inventoryDashboardState.data.transactions
+      ) || []
+    );
+
+  }
+
+
+  /*
+   * ==========================================================
+   * TRANSACTION DATE FORMAT
+   * ==========================================================
+   */
+
+  function formatInventoryTransactionDate(
+    value
+  ) {
+
+    if (!value) {
+      return '';
+    }
+
+
+    const date =
+      new Date(value);
+
+
+    if (
+      isNaN(
+        date.getTime()
+      )
+    ) {
+
+      return String(value);
+
+    }
+
+
+    const day =
+      String(
+        date.getDate()
+      )
+      .padStart(
+        2,
+        '0'
+      );
+
+
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+
+
+    const month =
+      monthNames[
+        date.getMonth()
+      ];
+
+
+    const year =
+      date.getFullYear();
+
+
+    let hours =
+      date.getHours();
+
+
+    const minutes =
+      String(
+        date.getMinutes()
+      )
+      .padStart(
+        2,
+        '0'
+      );
+
+
+    const ampm =
+      hours >= 12
+        ? 'PM'
+        : 'AM';
+
+
+    hours =
+      hours % 12 ||
+      12;
+
+
+    return (
+      day +
+      '-' +
+      month +
+      '-' +
+      year +
+      ' ' +
+      hours +
+      ':' +
+      minutes +
+      ' ' +
+      ampm
+    );
+
+  }
+
+
+  /*
+   * ==========================================================
+   * ESCAPE HTML
+   * ==========================================================
+   */
+
+  function escapeHtml(
+    value
+  ) {
+
+    return String(
+      value == null
+        ? ''
+        : value
+    )
+      .replace(
+        /&/g,
+        '&amp;'
+      )
+      .replace(
+        /</g,
+        '&lt;'
+      )
+      .replace(
+        />/g,
+        '&gt;'
+      )
+      .replace(
+        /"/g,
+        '&quot;'
+      )
+      .replace(
+        /'/g,
+        '&#039;'
+      );
+
+  }
+
+
+  /*
+   * ==========================================================
+   * ESCAPE JAVASCRIPT STRING
+   * ==========================================================
+   */
+
+  function escapeJsString(
+    value
+  ) {
+
+    return String(
+      value == null
+        ? ''
+        : value
+    )
+      .replace(
+        /\\/g,
+        '\\\\'
+      )
+      .replace(
+        /'/g,
+        "\\'"
+      )
+      .replace(
+        /\r/g,
+        '\\r'
+      )
+      .replace(
+        /\n/g,
+        '\\n'
+      );
+
+  }
+
+
+  /*
+   * ==========================================================
+   * START
+   * ==========================================================
+   */
+
+  window.addEventListener(
+    'load',
+    function() {
+
+      loadDashboard();
+
+    }
+  );
+
+</script>
+
+

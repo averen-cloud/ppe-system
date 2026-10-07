@@ -1125,6 +1125,11 @@
 // RELEASE PPE
 // ============================================
 
+
+// ============================================
+// RELEASE PPE
+// ============================================
+
 function releasePPE() {
 
   hideMessages();
@@ -1174,9 +1179,16 @@ function releasePPE() {
 
   const issuanceItems = [];
 
+  let validationError = '';
+
 
   currentRequest.forEach(
     function(row, index) {
+
+      if (validationError) {
+        return;
+      }
+
 
       const input =
         document.querySelector(
@@ -1215,9 +1227,12 @@ function releasePPE() {
         availableBalance
       ) {
 
-        showError(
-          'Release quantity cannot exceed the remaining balance.'
-        );
+        validationError =
+          'Release quantity for ' +
+          (row['PPE Item'] || '') +
+          ' cannot exceed the remaining balance of ' +
+          availableBalance +
+          '.';
 
         return;
 
@@ -1250,6 +1265,17 @@ function releasePPE() {
 
     }
   );
+
+
+  if (validationError) {
+
+    showError(
+      validationError
+    );
+
+    return;
+
+  }
 
 
   if (
@@ -1300,17 +1326,163 @@ function releasePPE() {
   };
 
 
-  console.log(
-    'Issuance Data:',
-    issuanceData
-  );
+  // ============================================
+  // SHOW SAVING MESSAGE
+  // ============================================
+
+  const releaseButton =
+    document.querySelector(
+      '.btn-release'
+    );
 
 
-  showSuccess(
-    'Release data prepared successfully. Backend save will be connected next.'
+  if (releaseButton) {
+
+    releaseButton.disabled = true;
+
+    releaseButton.textContent =
+      'Saving...';
+
+  }
+
+
+  // ============================================
+  // SEND TO GOOGLE APPS SCRIPT
+  // ============================================
+
+  fetch(
+    API_URL,
+    {
+      method: 'POST',
+
+      headers: {
+        'Content-Type':
+          'text/plain;charset=utf-8'
+      },
+
+      body: JSON.stringify({
+
+        action:
+          'savePPEIssuance',
+
+        data:
+          issuanceData
+
+      })
+
+    }
+  )
+  .then(
+    function(response) {
+
+      return response.text();
+
+    }
+  )
+  .then(
+    function(text) {
+
+      let result;
+
+      try {
+
+        result =
+          JSON.parse(text);
+
+      } catch (error) {
+
+        throw new Error(
+          'Invalid response from PPE backend.'
+        );
+
+      }
+
+
+      if (
+        !result ||
+        result.success !== true
+      ) {
+
+        throw new Error(
+          result &&
+          result.error
+            ? result.error
+            : 'PPE issuance could not be saved.'
+        );
+
+      }
+
+
+      // ============================================
+      // SUCCESS
+      // ============================================
+
+      showSuccess(
+        result.message ||
+        'PPE issuance saved successfully.'
+      );
+
+
+      // Disable release button
+      if (releaseButton) {
+
+        releaseButton.disabled =
+          true;
+
+        releaseButton.textContent =
+          'Released Successfully';
+
+      }
+
+
+      // Refresh Request Information status
+      const statusElement =
+        document.getElementById(
+          'displayStatus'
+        );
+
+      if (statusElement) {
+
+        statusElement.textContent =
+          result.status ||
+          'Issued';
+
+      }
+
+    }
+  )
+  .catch(
+    function(error) {
+
+      console.error(
+        'PPE issuance error:',
+        error
+      );
+
+
+      showError(
+        error &&
+        error.message
+          ? error.message
+          : 'Unable to save PPE issuance.'
+      );
+
+
+      if (releaseButton) {
+
+        releaseButton.disabled =
+          false;
+
+        releaseButton.textContent =
+          'Release PPE';
+
+      }
+
+    }
   );
 
 }
+
   
   // ============================================
   // ERROR

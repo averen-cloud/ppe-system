@@ -90,9 +90,7 @@
   <h1>PPE Stock Receipt</h1>
 
 
-  <!-- PPE ITEM -->
-
-  <label for="stockReceiptItemNo">
+  <label for="itemNo">
     PPE Item
   </label>
 
@@ -104,8 +102,6 @@
 
   </select>
 
-
-  <!-- ITEM INFORMATION -->
 
   <div
     id="itemInfo"
@@ -141,9 +137,7 @@
   </div>
 
 
-  <!-- RECEIVED QTY -->
-
-  <label for="stockReceiptReceivedQty">
+  <label for="receivedQty">
     Received Qty
   </label>
 
@@ -156,9 +150,7 @@
   >
 
 
-  <!-- RECEIVED BY -->
-
-  <label for="stockReceiptReceivedBy">
+  <label for="receivedBy">
     Received By
   </label>
 
@@ -169,9 +161,7 @@
   >
 
 
-  <!-- SUPPLIER -->
-
-  <label for="stockReceiptSupplier">
+  <label for="supplier">
     Supplier
   </label>
 
@@ -182,9 +172,7 @@
   >
 
 
-  <!-- REMARKS -->
-
-  <label for="stockReceiptRemarks">
+  <label for="remarks">
     Remarks
   </label>
 
@@ -193,8 +181,6 @@
     placeholder="Optional remarks"
   ></textarea>
 
-
-  <!-- SAVE -->
 
   <button
     id="stockReceiptSaveButton"
@@ -206,8 +192,6 @@
   </button>
 
 
-  <!-- MESSAGE -->
-
   <div
     id="stockReceiptMessage"
     class="message"
@@ -218,30 +202,16 @@
 
 <script>
 
-  /*
-   * ==========================================================
-   * CONFIGURATION
-   * ==========================================================
-   */
-
   const STOCK_RECEIPT_API_URL =
     'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec';
 
 
-  /*
-   * ==========================================================
-   * STATE
-   * ==========================================================
-   */
-
   let inventoryItems = [];
 
 
-  /*
-   * ==========================================================
-   * LOAD PPE INVENTORY
-   * ==========================================================
-   */
+  /* ==========================================
+     LOAD PPE INVENTORY
+  ========================================== */
 
   function loadStockReceiptInventory() {
 
@@ -250,12 +220,7 @@
         'stockReceiptItemNo'
       );
 
-
     if (!select) {
-
-      console.error(
-        'Stock Receipt: PPE item dropdown not found.'
-      );
 
       return;
 
@@ -281,12 +246,6 @@
       false;
 
 
-    /*
-     * ----------------------------------------------------------
-     * CLEANUP
-     * ----------------------------------------------------------
-     */
-
     function cleanup() {
 
       if (finished) {
@@ -294,7 +253,6 @@
         return;
 
       }
-
 
       finished =
         true;
@@ -316,20 +274,8 @@
     }
 
 
-    /*
-     * ----------------------------------------------------------
-     * JSONP CALLBACK
-     * ----------------------------------------------------------
-     */
-
     window[callbackName] =
       function(data) {
-
-        console.log(
-          'Stock Receipt PPE Inventory Response:',
-          data
-        );
-
 
         if (finished) {
 
@@ -339,12 +285,6 @@
 
 
         try {
-
-          /*
-           * --------------------------------------------------
-           * VALIDATE DATA
-           * --------------------------------------------------
-           */
 
           if (
             !Array.isArray(data)
@@ -357,31 +297,13 @@
           }
 
 
-          /*
-           * --------------------------------------------------
-           * STORE INVENTORY
-           * --------------------------------------------------
-           */
-
           inventoryItems =
             data;
 
 
-          /*
-           * --------------------------------------------------
-           * CLEAR DROPDOWN
-           * --------------------------------------------------
-           */
-
           select.innerHTML =
             '<option value="">Select PPE Item</option>';
 
-
-          /*
-           * --------------------------------------------------
-           * ADD ITEMS
-           * --------------------------------------------------
-           */
 
           inventoryItems.forEach(
             function(item) {
@@ -389,18 +311,6 @@
               const itemNo =
                 String(
                   item.itemNo || ''
-                ).trim();
-
-
-              const ppeItem =
-                String(
-                  item.ppeItem || ''
-                ).trim();
-
-
-              const unit =
-                String(
-                  item.unit || ''
                 ).trim();
 
 
@@ -422,11 +332,11 @@
 
 
               option.textContent =
-                itemNo +
+                item.itemNo +
                 ' - ' +
-                ppeItem +
+                item.ppeItem +
                 ' (' +
-                unit +
+                item.unit +
                 ')';
 
 
@@ -438,12 +348,6 @@
           );
 
 
-          /*
-           * --------------------------------------------------
-           * NO ITEMS
-           * --------------------------------------------------
-           */
-
           if (
             select.options.length === 1
           ) {
@@ -453,14 +357,7 @@
 
           }
 
-
         } catch (error) {
-
-          console.error(
-            'Stock Receipt Inventory Error:',
-            error
-          );
-
 
           select.innerHTML =
             '<option value="">Unable to load PPE items</option>';
@@ -480,12 +377,6 @@
       };
 
 
-    /*
-     * ----------------------------------------------------------
-     * API URL
-     * ----------------------------------------------------------
-     */
-
     script.src =
       STOCK_RECEIPT_API_URL +
       '?api=getActivePPEInventory' +
@@ -495,25 +386,8 @@
       );
 
 
-    console.log(
-      'Stock Receipt API URL:',
-      script.src
-    );
-
-
-    /*
-     * ----------------------------------------------------------
-     * API ERROR
-     * ----------------------------------------------------------
-     */
-
     script.onerror =
       function() {
-
-        console.error(
-          'Stock Receipt PPE Inventory API failed.'
-        );
-
 
         select.innerHTML =
           '<option value="">Unable to load PPE items</option>';
@@ -530,12 +404,6 @@
       };
 
 
-    /*
-     * ----------------------------------------------------------
-     * TIMEOUT
-     * ----------------------------------------------------------
-     */
-
     setTimeout(
       function() {
 
@@ -544,11 +412,6 @@
           return;
 
         }
-
-
-        console.error(
-          'Stock Receipt PPE Inventory API timeout.'
-        );
 
 
         select.innerHTML =
@@ -568,12 +431,6 @@
     );
 
 
-    /*
-     * ----------------------------------------------------------
-     * START REQUEST
-     * ----------------------------------------------------------
-     */
-
     document.head.appendChild(
       script
     );
@@ -581,13 +438,14 @@
   }
 
 
-  /*
-   * ==========================================================
-   * PPE ITEM CHANGE
-   * ==========================================================
-   */
+  /* ==========================================
+     INITIALIZE
+  ========================================== */
 
-  function handleStockReceiptItemChange() {
+  function initializeStockReceipt() {
+
+    loadStockReceiptInventory();
+
 
     const select =
       document.getElementById(
@@ -595,80 +453,77 @@
       );
 
 
-    const info =
-      document.getElementById(
-        'itemInfo'
-      );
+    if (select) {
+
+      select.onchange =
+        function() {
+
+          const itemNo =
+            String(
+              this.value || ''
+            ).trim();
 
 
-    if (
-      !select ||
-      !info
-    ) {
+          const item =
+            inventoryItems.find(
+              function(row) {
 
-      return;
+                return String(
+                  row.itemNo || ''
+                ).trim() ===
+                itemNo;
+
+              }
+            );
+
+
+          const info =
+            document.getElementById(
+              'itemInfo'
+            );
+
+
+          if (!item) {
+
+            info.style.display =
+              'none';
+
+            return;
+
+          }
+
+
+          document.getElementById(
+            'ppeItem'
+          ).textContent =
+            item.ppeItem || '';
+
+
+          document.getElementById(
+            'unit'
+          ).textContent =
+            item.unit || '';
+
+
+          document.getElementById(
+            'currentQty'
+          ).textContent =
+            item.availableQty || 0;
+
+
+          info.style.display =
+            'block';
+
+        };
 
     }
-
-
-    const itemNo =
-      String(
-        select.value || ''
-      ).trim();
-
-
-    const item =
-      inventoryItems.find(
-        function(row) {
-
-          return String(
-            row.itemNo || ''
-          ).trim() ===
-          itemNo;
-
-        }
-      );
-
-
-    if (!item) {
-
-      info.style.display =
-        'none';
-
-      return;
-
-    }
-
-
-    document.getElementById(
-      'ppeItem'
-    ).textContent =
-      item.ppeItem || '';
-
-
-    document.getElementById(
-      'unit'
-    ).textContent =
-      item.unit || '';
-
-
-    document.getElementById(
-      'currentQty'
-    ).textContent =
-      item.availableQty || 0;
-
-
-    info.style.display =
-      'block';
 
   }
 
 
-  /*
-   * ==========================================================
-   * SAVE STOCK RECEIPT
-   * ==========================================================
-   */
+  /* ==========================================
+     SAVE STOCK RECEIPT
+  ========================================== */
 
   function saveStockReceipt() {
 
@@ -710,12 +565,6 @@
       ).value.trim();
 
 
-    /*
-     * ----------------------------------------------------------
-     * VALIDATION
-     * ----------------------------------------------------------
-     */
-
     if (!itemNo) {
 
       showStockReceiptMessage(
@@ -755,57 +604,13 @@
     }
 
 
-    /*
-     * ----------------------------------------------------------
-     * DISABLE BUTTON
-     * ----------------------------------------------------------
-     */
-
     saveButton.disabled =
       true;
+
 
     saveButton.textContent =
       'Saving...';
 
-
-    /*
-     * ----------------------------------------------------------
-     * REQUEST DATA
-     * ----------------------------------------------------------
-     */
-
-    const requestData = {
-
-      action:
-        'addPPEStockReceipt',
-
-      data: {
-
-        itemNo:
-          itemNo,
-
-        receivedQty:
-          receivedQty,
-
-        receivedBy:
-          receivedBy,
-
-        supplier:
-          supplier,
-
-        remarks:
-          remarks
-
-      }
-
-    };
-
-
-    /*
-     * ----------------------------------------------------------
-     * SEND TO APPS SCRIPT
-     * ----------------------------------------------------------
-     */
 
     fetch(
       STOCK_RECEIPT_API_URL,
@@ -822,9 +627,31 @@
         },
 
         body:
-          JSON.stringify(
-            requestData
-          )
+          JSON.stringify({
+
+            action:
+              'addPPEStockReceipt',
+
+            data: {
+
+              itemNo:
+                itemNo,
+
+              receivedQty:
+                receivedQty,
+
+              receivedBy:
+                receivedBy,
+
+              supplier:
+                supplier,
+
+              remarks:
+                remarks
+
+            }
+
+          })
 
       }
     )
@@ -850,12 +677,6 @@
     .then(
       function(result) {
 
-        console.log(
-          'Stock Receipt Save Response:',
-          result
-        );
-
-
         if (
           !result ||
           result.success === false
@@ -870,12 +691,6 @@
 
         }
 
-
-        /*
-         * ------------------------------------------------------
-         * SUCCESS
-         * ------------------------------------------------------
-         */
 
         showStockReceiptMessage(
 
@@ -898,12 +713,6 @@
         );
 
 
-        /*
-         * ------------------------------------------------------
-         * CLEAR INPUTS
-         * ------------------------------------------------------
-         */
-
         document.getElementById(
           'stockReceiptReceivedQty'
         ).value =
@@ -922,24 +731,13 @@
           '';
 
 
-        /*
-         * ------------------------------------------------------
-         * ENABLE BUTTON
-         * ------------------------------------------------------
-         */
-
         saveButton.disabled =
           false;
+
 
         saveButton.textContent =
           'Save Stock Receipt';
 
-
-        /*
-         * ------------------------------------------------------
-         * REFRESH INVENTORY
-         * ------------------------------------------------------
-         */
 
         loadStockReceiptInventory();
 
@@ -948,12 +746,6 @@
 
     .catch(
       function(error) {
-
-        console.error(
-          'Stock Receipt Save Error:',
-          error
-        );
-
 
         showStockReceiptMessage(
 
@@ -970,6 +762,7 @@
         saveButton.disabled =
           false;
 
+
         saveButton.textContent =
           'Save Stock Receipt';
 
@@ -979,11 +772,9 @@
   }
 
 
-  /*
-   * ==========================================================
-   * MESSAGE
-   * ==========================================================
-   */
+  /* ==========================================
+     MESSAGE
+  ========================================== */
 
   function showStockReceiptMessage(
     message,
@@ -1022,55 +813,9 @@
   }
 
 
-  /*
-   * ==========================================================
-   * INITIALIZE STOCK RECEIPT
-   * ==========================================================
-   */
-
-  function initializeStockReceipt() {
-
-    const select =
-      document.getElementById(
-        'stockReceiptItemNo'
-      );
-
-
-    if (!select) {
-
-      console.error(
-        'Stock Receipt initialization failed: dropdown not found.'
-      );
-
-      return;
-
-    }
-
-
-    /*
-     * PPE ITEM CHANGE EVENT
-     */
-
-    select.addEventListener(
-      'change',
-      handleStockReceiptItemChange
-    );
-
-
-    /*
-     * LOAD PPE INVENTORY
-     */
-
-    loadStockReceiptInventory();
-
-  }
-
-
-  /*
-   * ==========================================================
-   * START
-   * ==========================================================
-   */
+  /* ==========================================
+     START
+  ========================================== */
 
   if (
     document.readyState ===
@@ -1089,3 +834,6 @@
   }
 
 </script>
+
+
+

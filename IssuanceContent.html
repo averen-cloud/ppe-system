@@ -534,15 +534,148 @@
 
 <script>
 
-  /*
-   * Backend conversion will be added next.
-   *
-   * The current HTML/design is intentionally
-   * preserved first.
-   */
-
   let currentRequest = null;
 
+  const API_URL =
+    'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec';
+
+
+  // ============================================
+  // LOAD APPROVED REQUESTS
+  // ============================================
+
+  function loadApprovedRequests() {
+
+    const dropdown =
+      document.getElementById('requestId');
+
+    dropdown.innerHTML =
+      '<option value="">Loading approved requests...</option>';
+
+
+    const callbackName =
+      'ppeIssuanceRequests_' +
+      Date.now();
+
+
+    window[callbackName] =
+      function(result) {
+
+        try {
+
+          dropdown.innerHTML =
+            '<option value="">Select an approved Request ID</option>';
+
+
+          if (
+            !result ||
+            !Array.isArray(result)
+          ) {
+
+            dropdown.innerHTML =
+              '<option value="">Unable to load requests</option>';
+
+            showError(
+              'Invalid response from PPE backend.'
+            );
+
+            return;
+
+          }
+
+
+          if (result.length === 0) {
+
+            dropdown.innerHTML =
+              '<option value="">No approved requests available</option>';
+
+            return;
+
+          }
+
+
+          result.forEach(
+            function(requestId) {
+
+              const option =
+                document.createElement(
+                  'option'
+                );
+
+              option.value =
+                requestId;
+
+              option.textContent =
+                requestId;
+
+              dropdown.appendChild(
+                option
+              );
+
+            }
+          );
+
+        }
+        finally {
+
+          delete window[callbackName];
+
+          const script =
+            document.getElementById(
+              callbackName
+            );
+
+          if (script) {
+            script.remove();
+          }
+
+        }
+
+      };
+
+
+    const script =
+      document.createElement('script');
+
+    script.id =
+      callbackName;
+
+    script.src =
+      API_URL +
+      '?api=getApprovedRequestsForIssuance' +
+      '&callback=' +
+      encodeURIComponent(
+        callbackName
+      );
+
+
+    script.onerror =
+      function() {
+
+        dropdown.innerHTML =
+          '<option value="">Unable to load requests</option>';
+
+        showError(
+          'Unable to connect to PPE backend.'
+        );
+
+        delete window[callbackName];
+
+        script.remove();
+
+      };
+
+
+    document
+      .body
+      .appendChild(script);
+
+  }
+
+
+  // ============================================
+  // ERROR
+  // ============================================
 
   function showError(message) {
 
@@ -560,6 +693,10 @@
   }
 
 
+  // ============================================
+  // SUCCESS
+  // ============================================
+
   function showSuccess(message) {
 
     const element =
@@ -575,6 +712,10 @@
 
   }
 
+
+  // ============================================
+  // HIDE MESSAGES
+  // ============================================
 
   function hideMessages() {
 
@@ -598,6 +739,10 @@
 
   }
 
+
+  // ============================================
+  // HTML ESCAPE
+  // ============================================
 
   function escapeHtml(value) {
 
@@ -631,29 +776,29 @@
   }
 
 
-  /*
-   * Temporary functions so the page
-   * does not produce errors before
-   * backend conversion.
-   */
+  // ============================================
+  // INITIALIZE
+  // ============================================
 
-  function findRequest() {
+  function initializeIssuance() {
 
-    showError(
-      'PPE Issuance backend connection will be added next.'
-    );
+    loadApprovedRequests();
 
   }
 
 
-  function releasePPE() {
+  // ============================================
+  // PAGE LOAD
+  // ============================================
 
-    showError(
-      'PPE Issuance backend connection will be added next.'
-    );
+  document.addEventListener(
+    'DOMContentLoaded',
+    function() {
 
-  }
+      initializeIssuance();
 
+    }
+  );
 
 </script>
 

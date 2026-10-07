@@ -286,28 +286,53 @@ function loadInventoryDashboardContent() {
 
       scripts.forEach(function(oldScript) {
 
-        const newScript =
-          document.createElement(
-            'script'
-          );
+  const newScript =
+    document.createElement(
+      'script'
+    );
 
-        if (oldScript.src) {
+  if (oldScript.src) {
 
-          newScript.src =
-            oldScript.src;
+    newScript.src =
+      oldScript.src;
 
-        } else {
+  } else {
 
-          newScript.textContent =
-            oldScript.textContent;
+    newScript.textContent =
+      oldScript.textContent;
 
-        }
+  }
 
-        document.body.appendChild(
-          newScript
-        );
+  document.body.appendChild(
+    newScript
 
-      });
+  );
+
+});
+
+
+// ============================================
+// START INVENTORY DASHBOARD
+// ============================================
+
+setTimeout(function() {
+
+  if (
+    typeof loadDashboard ===
+    'function'
+  ) {
+
+    loadDashboard();
+
+  } else {
+
+    console.error(
+      'loadDashboard() was not found.'
+    );
+
+  }
+
+}, 100);
 
     })
 

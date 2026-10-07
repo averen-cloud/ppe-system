@@ -808,5 +808,47 @@ function saveStockReceipt() {
 
   }
 
+  function showStockReceiptMessage(
+    message,
+    success
+  ) {
+
+    const element =
+      document.getElementById(
+        'stockReceiptMessage'
+      );
+
+    element.textContent =
+      message;
+
+    element.className =
+      'message ' +
+      (
+        success
+          ? 'success'
+          : 'error'
+      );
+
+    element.style.display =
+      'block';
+
+  }
+
+
+  /*
+   * ==========================================================
+   * START STOCK RECEIPT
+   * ==========================================================
+   */
+
+  window.addEventListener(
+    'load',
+    function() {
+
+      initializeStockReceipt();
+
+    }
+  );
+
 </script>
 

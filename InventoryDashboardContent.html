@@ -2197,16 +2197,27 @@ function showInventoryItemDetails(
   );
 
 
-  google.script.run
+  const callbackName =
+    'ppeInventoryItemDetails_' +
+    Date.now();
 
-    .withSuccessHandler(
-      function(data) {
 
-        console.log(
-          'SERVER DATA:',
-          data
-        );
+  const script =
+    document.createElement(
+      'script'
+    );
 
+
+  window[callbackName] =
+    function(data) {
+
+      console.log(
+        'ITEM DETAILS DATA:',
+        data
+      );
+
+
+      try {
 
         if (!data) {
 
@@ -2355,7 +2366,8 @@ function showInventoryItemDetails(
           (data.transactionHistory || []).slice().sort(
             function(a, b) {
 
-              return new Date(b.date) - new Date(a.date);
+              return new Date(b.date) -
+                new Date(a.date);
 
             }
           );
@@ -3013,34 +3025,99 @@ function showInventoryItemDetails(
         });
 
 
-      }
-    )
-
-    .withFailureHandler(
-      function(error) {
+      } catch (error) {
 
         console.error(
-          'Inventory Details Error:',
+          'Inventory Details Render Error:',
           error
         );
 
 
         alert(
-          'Error loading item details: ' +
-          (
-            error &&
-            error.message
-              ? error.message
-              : error
-          )
+          'Error displaying item details: ' +
+          error.message
         );
 
       }
-    )
 
-    .getInventoryItemDetails(
+
+      /*
+       * ======================================================
+       * CLEANUP JSONP CALLBACK
+       * ======================================================
+       */
+
+      delete window[callbackName];
+
+
+      if (
+        script.parentNode
+      ) {
+
+        script.parentNode.removeChild(
+          script
+        );
+
+      }
+
+    };
+
+
+  /*
+   * ==========================================================
+   * JSONP API CALL
+   * ==========================================================
+   */
+
+  script.src =
+    'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec' +
+    '?api=getInventoryItemDetails' +
+    '&itemNo=' +
+    encodeURIComponent(
       String(itemNo)
-    );
+    ) +
+    '&callback=' +
+    callbackName;
+
+
+  /*
+   * ==========================================================
+   * API ERROR
+   * ==========================================================
+   */
+
+  script.onerror =
+    function() {
+
+      console.error(
+        'Inventory Details API script failed.'
+      );
+
+
+      alert(
+        'Unable to connect to PPE Inventory API.'
+      );
+
+
+      delete window[callbackName];
+
+
+      if (
+        script.parentNode
+      ) {
+
+        script.parentNode.removeChild(
+          script
+        );
+
+      }
+
+    };
+
+
+  document.body.appendChild(
+    script
+  );
 
 }
 

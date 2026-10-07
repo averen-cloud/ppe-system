@@ -1121,7 +1121,197 @@
 
   }
 
+// ============================================
+// RELEASE PPE
+// ============================================
 
+function releasePPE() {
+
+  hideMessages();
+
+  if (
+    !currentRequest ||
+    currentRequest.length === 0
+  ) {
+
+    showError(
+      'Please find an approved Request ID first.'
+    );
+
+    return;
+
+  }
+
+
+  const releasedBy =
+    document
+      .getElementById('issuanceReleasedBy')
+      .value
+      .trim();
+
+
+  const remarks =
+    document
+      .getElementById('issuanceRemarks')
+      .value
+      .trim();
+
+
+  if (!releasedBy) {
+
+    showError(
+      'Please enter Released By.'
+    );
+
+    return;
+
+  }
+
+
+  const requestId =
+    currentRequest[0]['Request ID'] || '';
+
+
+  const issuanceItems = [];
+
+
+  currentRequest.forEach(
+    function(row, index) {
+
+      const input =
+        document.querySelector(
+          `.releasedQty[data-index="${index}"]`
+        );
+
+
+      const releasedQty =
+        input
+          ? Number(input.value) || 0
+          : 0;
+
+
+      const requestedQty =
+        Number(
+          row['Quantity']
+        ) || 0;
+
+
+      const alreadyReleased =
+        Number(
+          row['Already Released Qty']
+        ) || 0;
+
+
+      const availableBalance =
+        Math.max(
+          requestedQty -
+          alreadyReleased,
+          0
+        );
+
+
+      if (
+        releasedQty >
+        availableBalance
+      ) {
+
+        showError(
+          'Release quantity cannot exceed the remaining balance.'
+        );
+
+        return;
+
+      }
+
+
+      if (releasedQty > 0) {
+
+        issuanceItems.push({
+
+          itemNo:
+            row['Item No'] || '',
+
+          ppeItem:
+            row['PPE Item'] || '',
+
+          requestedQty:
+            requestedQty,
+
+          releasedQty:
+            releasedQty,
+
+          balanceQty:
+            availableBalance -
+            releasedQty
+
+        });
+
+      }
+
+    }
+  );
+
+
+  if (
+    issuanceItems.length === 0
+  ) {
+
+    showError(
+      'Please enter at least one Release Now quantity.'
+    );
+
+    return;
+
+  }
+
+
+  const issuanceData = {
+
+    requestId:
+      requestId,
+
+    releaseDate:
+      new Date().toISOString(),
+
+    employeeNumber:
+      currentRequest[0]['Employee Number'] || '',
+
+    employeeName:
+      currentRequest[0]['Employee Name'] || '',
+
+    department:
+      currentRequest[0]['Department'] || '',
+
+    projectCode:
+      currentRequest[0]['Project Code'] || '',
+
+    projectSite:
+      currentRequest[0]['Project Site'] || '',
+
+    releasedBy:
+      releasedBy,
+
+    remarks:
+      remarks,
+
+    items:
+      issuanceItems
+
+  };
+
+
+  console.log(
+    'Issuance Data:',
+    issuanceData
+  );
+
+
+  showSuccess(
+    'Release data prepared successfully. Backend save will be connected next.'
+  );
+
+}
+  
   // ============================================
   // ERROR
   // ============================================

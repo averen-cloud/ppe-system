@@ -1,0 +1,507 @@
+<style>
+
+  .stock-receipt-container {
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.10);
+  }
+
+  .stock-receipt-container h1 {
+    margin-top: 0;
+  }
+
+  .stock-receipt-container label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+  }
+
+  .stock-receipt-container select,
+  .stock-receipt-container input,
+  .stock-receipt-container textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    margin-top: 6px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+
+  .stock-receipt-container textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+
+  .stock-receipt-container button {
+    margin-top: 25px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+  }
+
+  .stock-receipt-container .save-button {
+    background: #198754;
+    color: white;
+  }
+
+  .stock-receipt-container .save-button:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+  }
+
+  .stock-receipt-container .message {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 5px;
+    display: none;
+  }
+
+  .stock-receipt-container .success {
+    background: #d1e7dd;
+    color: #0f5132;
+  }
+
+  .stock-receipt-container .error {
+    background: #f8d7da;
+    color: #842029;
+  }
+
+  .stock-receipt-container .item-info {
+    margin-top: 15px;
+    padding: 12px;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    display: none;
+  }
+
+</style>
+
+
+<div class="stock-receipt-container">
+
+  <h1>PPE Stock Receipt</h1>
+
+  <label for="itemNo">
+    PPE Item
+  </label>
+
+  <select id="stockReceiptItemNo">
+    <option value="">
+      Loading PPE items...
+    </option>
+  </select>
+
+  <div
+    id="itemInfo"
+    class="item-info"
+  >
+    <div>
+      <strong>PPE Item:</strong>
+      <span id="ppeItem"></span>
+    </div>
+
+    <div style="margin-top:8px;">
+      <strong>Unit:</strong>
+      <span id="unit"></span>
+    </div>
+
+    <div style="margin-top:8px;">
+      <strong>Current Available Qty:</strong>
+      <span id="currentQty"></span>
+    </div>
+  </div>
+
+
+  <label for="receivedQty">
+    Received Qty
+  </label>
+
+  <input
+    type="number"
+    id="stockReceiptReceivedQty"
+    min="1"
+    step="1"
+    placeholder="Enter received quantity"
+  >
+
+
+  <label for="receivedBy">
+    Received By
+  </label>
+
+  <input
+    type="text"
+    id="stockReceiptReceivedBy"
+    placeholder="Enter name"
+  >
+
+
+  <label for="supplier">
+    Supplier
+  </label>
+
+  <input
+    type="text"
+    id="stockReceiptSupplier"
+    placeholder="Enter supplier"
+  >
+
+
+  <label for="remarks">
+    Remarks
+  </label>
+
+  <textarea
+    id="stockReceiptRemarks"
+    placeholder="Optional remarks"
+  ></textarea>
+
+
+  <button
+    id="stockReceiptSaveButton"
+    class="save-button"
+    onclick="saveStockReceipt()"
+  >
+    Save Stock Receipt
+  </button>
+
+
+  <div
+    id="stockReceiptMessage"
+    class="message"
+  ></div>
+
+</div>
+
+
+<script>
+
+  let inventoryItems = [];
+
+
+  function loadStockReceiptInventory() {
+
+  const select =
+    document.getElementById('stockReceiptItemNo');
+
+  if (!select) {
+    return;
+  }
+
+  select.innerHTML =
+    '<option value="">Loading PPE items...</option>';
+
+  google.script.run
+
+    .withSuccessHandler(function(data) {
+
+      inventoryItems = data || [];
+
+      select.innerHTML =
+        '<option value="">Select PPE Item</option>';
+
+      inventoryItems.forEach(function(item) {
+
+        const option =
+          document.createElement('option');
+
+        option.value =
+          String(item.itemNo || '').trim();
+
+        option.textContent =
+          item.itemNo +
+          ' - ' +
+          item.ppeItem +
+          ' (' +
+          item.unit +
+          ')';
+
+        select.appendChild(option);
+
+      });
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      select.innerHTML =
+        '<option value="">Unable to load PPE items</option>';
+
+      showStockReceiptMessage(
+        error && error.message
+          ? error.message
+          : 'Unable to load PPE inventory.',
+        false
+      );
+
+    })
+
+    .getActivePPEInventory();
+
+}
+
+
+  function initializeStockReceipt() {
+
+    loadStockReceiptInventory();
+
+    const select =
+      document.getElementById(
+         'stockReceiptItemNo'
+    );
+
+    if (select) {
+
+      select.onchange =
+        function() {
+
+          const itemNo =
+            this.value;
+
+          const item =
+            inventoryItems.find(
+              function(row) {
+
+                return row.itemNo ===
+                  itemNo;
+
+              }
+            );
+
+          const info =
+            document.getElementById(
+              'itemInfo'
+            );
+
+          if (!item) {
+
+            info.style.display =
+              'none';
+
+            return;
+
+          }
+
+          document.getElementById(
+            'ppeItem'
+          ).textContent =
+            item.ppeItem;
+
+          document.getElementById(
+            'unit'
+          ).textContent =
+            item.unit;
+
+          document.getElementById(
+            'currentQty'
+          ).textContent =
+            item.availableQty;
+
+          info.style.display =
+            'block';
+
+        };
+
+    }
+
+  }
+
+
+  function saveStockReceipt() {
+
+    const saveButton =
+      document.getElementById(
+          'stockReceiptSaveButton'
+    );
+
+    const itemNo =
+      document.getElementById(
+          'stockReceiptItemNo'
+    ).value;
+
+    const receivedQty =
+      Number(
+      document.getElementById(
+          'stockReceiptReceivedQty'
+    ).value
+  );
+
+    const receivedBy =
+      document.getElementById(
+          'stockReceiptReceivedBy'
+    ).value.trim();
+
+    const supplier =
+      document.getElementById(
+          'stockReceiptSupplier'
+    ).value.trim();
+
+    const remarks =
+      document.getElementById(
+          'stockReceiptRemarks'
+    ).value.trim();
+
+
+    if (!itemNo) {
+
+      showStockReceiptMessage(
+        'Please select a PPE item.',
+        false
+      );
+
+      return;
+
+    }
+
+
+    if (
+      !receivedQty ||
+      receivedQty <= 0
+    ) {
+
+      showStockReceiptMessage(
+        'Received Qty must be greater than zero.',
+        false
+      );
+
+      return;
+
+    }
+
+
+    if (!receivedBy) {
+
+      showStockReceiptMessage(
+        'Received By is required.',
+        false
+      );
+
+      return;
+
+    }
+
+
+    saveButton.disabled =
+      true;
+
+    saveButton.textContent =
+      'Saving...';
+
+
+    google.script.run
+
+      .withSuccessHandler(
+        function(result) {
+
+          showStockReceiptMessage(
+            'Stock receipt saved successfully. ' +
+            'Receipt ID: ' +
+            result.receiptId +
+            ' | New Available Qty: ' +
+            result.newAvailableQty +
+            ' ' +
+            result.unit,
+            true
+          );
+
+
+          document.getElementById(
+            'stockReceiptReceivedQty'
+          ).value = '';
+
+          document.getElementById(
+            'stockReceiptSupplier'
+          ).value = '';
+
+          document.getElementById(
+            'stockReceiptRemarks'
+          ).value = '';
+
+
+          saveButton.disabled =
+            false;
+
+          saveButton.textContent =
+            'Save Stock Receipt';
+
+
+          loadStockReceiptInventory();
+
+        }
+      )
+
+      .withFailureHandler(
+        function(error) {
+
+          showStockReceiptMessage(
+            error.message,
+            false
+          );
+
+          saveButton.disabled =
+            false;
+
+          saveButton.textContent =
+            'Save Stock Receipt';
+
+        }
+      )
+
+      .addPPEStockReceipt({
+
+        itemNo:
+          itemNo,
+
+        receivedQty:
+          receivedQty,
+
+        receivedBy:
+          receivedBy,
+
+        supplier:
+          supplier,
+
+        remarks:
+          remarks
+
+      });
+
+  }
+
+
+  function showStockReceiptMessage(
+    message,
+    success
+  ) {
+
+    const element =
+      document.getElementById(
+        'stockReceiptMessage'
+      );
+
+    element.textContent =
+      message;
+
+    element.className =
+      'message ' +
+      (
+        success
+          ? 'success'
+          : 'error'
+      );
+
+    element.style.display =
+      'block';
+
+  }
+
+</script>
+

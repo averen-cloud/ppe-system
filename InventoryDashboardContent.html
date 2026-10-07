@@ -1030,88 +1030,68 @@
       '<div class="loading">Loading transactions...</div>';
 
 
-    google.script.run
+    fetch(
+  'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec?api=getInventoryDashboardData'
+)
 
-      .withSuccessHandler(
-        function(data) {
+  .then(function(response) {
 
-          inventoryDashboardState.data =
-            data;
+    if (!response.ok) {
 
-          inventoryDashboardState.summaryPage =
-            1;
+      throw new Error(
+        'Unable to connect to PPE backend.'
+      );
 
-          inventoryDashboardState.inventoryPage =
-            1;
+    }
 
-          inventoryDashboardState.transactionPage =
-            1;
+    return response.json();
 
+  })
 
-          renderDashboard(data);
+  .then(function(data) {
 
+    inventoryDashboardState.data =
+      data;
 
-          if (refreshButton) {
+    inventoryDashboardState.summaryPage =
+      1;
 
-            refreshButton.disabled =
-              false;
+    inventoryDashboardState.inventoryPage =
+      1;
 
-            refreshButton.textContent =
-              'Refresh';
+    inventoryDashboardState.transactionPage =
+      1;
 
-          }
+    renderDashboard(data);
 
-        }
-      )
+  })
 
-      .withFailureHandler(
-        function(error) {
+  .catch(function(error) {
 
-          const message =
-            error &&
-            error.message
-              ? error.message
-              : String(error);
+    const message =
+      document.getElementById(
+        'inventoryDashboardMessage'
+      );
 
+    if (message) {
 
-          document.getElementById(
-            'inventoryContainer'
-          ).innerHTML =
-            '<div class="loading">' +
-            escapeHtml(message) +
-            '</div>';
+      message.textContent =
+        error.message ||
+        'Unable to load Inventory Dashboard.';
 
+      message.style.display =
+        'block';
 
-          document.getElementById(
-            'inventorySummaryContainer'
-          ).innerHTML =
-            '<div class="loading">' +
-            escapeHtml(message) +
-            '</div>';
+    } else {
 
+      console.error(
+        'Inventory Dashboard Error:',
+        error
+      );
 
-          document.getElementById(
-            'transactionContainer'
-          ).innerHTML =
-            '<div class="loading">' +
-            escapeHtml(message) +
-            '</div>';
+    }
 
-
-          if (refreshButton) {
-
-            refreshButton.disabled =
-              false;
-
-            refreshButton.textContent =
-              'Refresh';
-
-          }
-
-        }
-      )
-
-      .getInventoryDashboardData();
+  });
 
   }
 

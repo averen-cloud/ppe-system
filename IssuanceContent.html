@@ -552,11 +552,9 @@
     dropdown.innerHTML =
       '<option value="">Loading approved requests...</option>';
 
-
     const callbackName =
       'ppeIssuanceRequests_' +
       Date.now();
-
 
     window[callbackName] =
       function(result) {
@@ -565,7 +563,6 @@
 
           dropdown.innerHTML =
             '<option value="">Select an approved Request ID</option>';
-
 
           if (
             !result ||
@@ -583,7 +580,6 @@
 
           }
 
-
           if (result.length === 0) {
 
             dropdown.innerHTML =
@@ -592,7 +588,6 @@
             return;
 
           }
-
 
           result.forEach(
             function(requestId) {
@@ -669,6 +664,460 @@
     document
       .body
       .appendChild(script);
+
+  }
+
+
+  // ============================================
+  // FIND APPROVED REQUEST
+  // ============================================
+
+  function findRequest() {
+
+    const requestId =
+      document
+        .getElementById('requestId')
+        .value
+        .trim();
+
+    hideMessages();
+
+    if (!requestId) {
+
+      showError(
+        'Please select a Request ID.'
+      );
+
+      return;
+
+    }
+
+
+    document
+      .getElementById('loadingMessage')
+      .style.display = 'block';
+
+
+    const callbackName =
+      'ppeIssuanceRequest_' +
+      Date.now();
+
+
+    window[callbackName] =
+      function(result) {
+
+        try {
+
+          document
+            .getElementById('loadingMessage')
+            .style.display = 'none';
+
+
+          if (
+            !result ||
+            !Array.isArray(result)
+          ) {
+
+            showError(
+              'Invalid response from PPE backend.'
+            );
+
+            return;
+
+          }
+
+
+          if (result.length === 0) {
+
+            showError(
+              'No PPE items found for Request ID: ' +
+              requestId
+            );
+
+            return;
+
+          }
+
+
+          currentRequest =
+            result;
+
+
+          displayRequest(
+            result
+          );
+
+        }
+
+        finally {
+
+          delete window[callbackName];
+
+          const script =
+            document.getElementById(
+              callbackName
+            );
+
+          if (script) {
+            script.remove();
+          }
+
+        }
+
+      };
+
+
+    const script =
+      document.createElement('script');
+
+
+    script.id =
+      callbackName;
+
+
+    script.src =
+      API_URL +
+      '?api=loadApprovedRequestForIssuance' +
+      '&requestId=' +
+      encodeURIComponent(
+        requestId
+      ) +
+      '&callback=' +
+      encodeURIComponent(
+        callbackName
+      );
+
+
+    script.onerror =
+      function() {
+
+        document
+          .getElementById('loadingMessage')
+          .style.display = 'none';
+
+
+        showError(
+          'Unable to connect to PPE backend.'
+        );
+
+
+        delete window[callbackName];
+
+        script.remove();
+
+      };
+
+
+    document
+      .body
+      .appendChild(script);
+
+  }
+
+
+  // ============================================
+  // DISPLAY REQUEST
+  // ============================================
+
+  function displayRequest(rows) {
+
+    if (
+      !rows ||
+      rows.length === 0
+    ) {
+
+      showError(
+        'No PPE items found for this request.'
+      );
+
+      return;
+
+    }
+
+
+    const firstRow =
+      rows[0];
+
+
+    // ============================================
+    // REQUEST DETAILS
+    // ============================================
+
+    document
+      .getElementById('displayRequestId')
+      .textContent =
+      firstRow['Request ID'] || '';
+
+
+    document
+      .getElementById('displayRequestor')
+      .textContent =
+      firstRow['Requestor'] || '';
+
+
+    document
+      .getElementById('displayEmployeeNumber')
+      .textContent =
+      firstRow['Employee Number'] || '';
+
+
+    document
+      .getElementById('displayEmployeeName')
+      .textContent =
+      firstRow['Employee Name'] || '';
+
+
+    document
+      .getElementById('displayDepartment')
+      .textContent =
+      firstRow['Department'] || '';
+
+
+    document
+      .getElementById('displayProjectCode')
+      .textContent =
+      firstRow['Project Code'] || '';
+
+
+    document
+      .getElementById('displayProjectSite')
+      .textContent =
+      firstRow['Project Site'] || '';
+
+
+    document
+      .getElementById('displayStatus')
+      .textContent =
+      firstRow['Current Status'] || '';
+
+
+    // ============================================
+    // PPE ITEMS
+    // ============================================
+
+    const tbody =
+      document.getElementById(
+        'itemsTableBody'
+      );
+
+
+    tbody.innerHTML = '';
+
+
+    rows.forEach(
+      function(row, index) {
+
+        const requestedQty =
+          Number(
+            row['Quantity']
+          ) || 0;
+
+
+        const alreadyReleased =
+          Number(
+            row['Already Released Qty']
+          ) || 0;
+
+
+        const balanceQty =
+          Number(
+            row['Balance Qty']
+          ) || 0;
+
+
+        const tr =
+          document.createElement(
+            'tr'
+          );
+
+
+        tr.innerHTML = `
+
+          <td>
+            ${escapeHtml(
+              row['Item No'] || ''
+            )}
+          </td>
+
+          <td>
+            ${escapeHtml(
+              row['PPE Item'] || ''
+            )}
+          </td>
+
+          <td>
+            ${requestedQty}
+          </td>
+
+          <td>
+            ${alreadyReleased}
+          </td>
+
+          <td>
+
+            <input
+              type="number"
+              min="0"
+              max="${balanceQty}"
+              value="${balanceQty}"
+              class="releasedQty"
+              data-index="${index}"
+            >
+
+          </td>
+
+          <td>
+
+            <span
+              class="balance"
+              data-index="${index}"
+            >
+              ${balanceQty}
+            </span>
+
+          </td>
+
+        `;
+
+
+        tbody.appendChild(
+          tr
+        );
+
+      }
+    );
+
+
+    attachQuantityEvents();
+
+
+    // ============================================
+    // SHOW SECTIONS
+    // ============================================
+
+    document
+      .getElementById(
+        'requestSection'
+      )
+      .classList
+      .remove('hidden');
+
+
+    document
+      .getElementById(
+        'itemsSection'
+      )
+      .classList
+      .remove('hidden');
+
+
+    document
+      .getElementById(
+        'releaseSection'
+      )
+      .classList
+      .remove('hidden');
+
+  }
+
+
+  // ============================================
+  // RELEASE QTY / BALANCE
+  // ============================================
+
+  function attachQuantityEvents() {
+
+    const inputs =
+      document.querySelectorAll(
+        '.releasedQty'
+      );
+
+
+    inputs.forEach(
+      function(input) {
+
+        input.addEventListener(
+          'input',
+          function() {
+
+            const index =
+              Number(
+                input.dataset.index
+              );
+
+
+            const requested =
+              Number(
+                currentRequest[index]['Quantity']
+              ) || 0;
+
+
+            const alreadyReleased =
+              Number(
+                currentRequest[index]['Already Released Qty']
+              ) || 0;
+
+
+            const availableBalance =
+              Math.max(
+                requested -
+                alreadyReleased,
+                0
+              );
+
+
+            let released =
+              Number(
+                input.value
+              ) || 0;
+
+
+            if (released < 0) {
+
+              released = 0;
+
+              input.value = 0;
+
+            }
+
+
+            if (
+              released >
+              availableBalance
+            ) {
+
+              released =
+                availableBalance;
+
+              input.value =
+                availableBalance;
+
+            }
+
+
+            const balance =
+              availableBalance -
+              released;
+
+
+            const balanceElement =
+              document.querySelector(
+                `.balance[data-index="${index}"]`
+              );
+
+
+            if (balanceElement) {
+
+              balanceElement.textContent =
+                balance;
+
+            }
+
+          }
+        );
+
+      }
+    );
 
   }
 

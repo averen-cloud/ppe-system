@@ -199,10 +199,18 @@
     ========================= -->
 
    <div id="inventory" class="tab-content active">
-  <div id="inventoryDashboardContent">
-    Loading Inventory Dashboard...
-  </div>
-  </div>
+
+  <iframe
+    src="InventoryDashboardContent.html"
+    style="
+      width:100%;
+      min-height:1200px;
+      border:none;
+      display:block;
+    "
+  ></iframe>
+
+</div>
 
 
     <!-- =========================
@@ -242,130 +250,7 @@
 
 <script>
 
-function loadInventoryDashboardContent() {
 
-  const container =
-    document.getElementById(
-      'inventoryDashboardContent'
-    );
-
-  if (!container) {
-    console.error(
-      'inventoryDashboardContent not found.'
-    );
-    return;
-  }
-
-  fetch(
-    './InventoryDashboardContent.html'
-  )
-    .then(function(response) {
-
-      console.log(
-        'Dashboard HTML status:',
-        response.status
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          'Dashboard HTML could not be loaded. HTTP ' +
-          response.status
-        );
-      }
-
-      return response.text();
-
-    })
-
-    .then(function(html) {
-
-      console.log(
-        'Dashboard HTML loaded.'
-      );
-
-      container.innerHTML = html;
-
-      const scripts =
-        container.querySelectorAll(
-          'script'
-        );
-
-      console.log(
-        'Dashboard scripts found:',
-        scripts.length
-      );
-
-      scripts.forEach(function(oldScript) {
-
-        const newScript =
-          document.createElement(
-            'script'
-          );
-
-        if (oldScript.src) {
-
-          newScript.src =
-            oldScript.src;
-
-        } else {
-
-          newScript.textContent =
-            oldScript.textContent;
-
-        }
-
-        document.body.appendChild(
-          newScript
-        );
-
-      });
-
-      setTimeout(function() {
-
-        if (
-          typeof window.loadDashboard ===
-          'function'
-        ) {
-
-          console.log(
-            'Starting Inventory Dashboard...'
-          );
-
-          window.loadDashboard();
-
-        } else {
-
-          console.error(
-            'loadDashboard() is NOT available.'
-          );
-
-        }
-
-      }, 500);
-
-    })
-
-    .catch(function(error) {
-
-      console.error(
-        'Dashboard loading error:',
-        error
-      );
-
-      container.innerHTML =
-        '<div style="' +
-        'padding:20px;' +
-        'background:#f8d7da;' +
-        'color:#842029;' +
-        'border-radius:8px;' +
-        '">' +
-        '<strong>Inventory Dashboard Error</strong><br><br>' +
-        error.message +
-        '</div>';
-
-    });
-
-}
 
 </script>
     

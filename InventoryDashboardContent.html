@@ -1035,26 +1035,26 @@
     fetch(
   'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec?api=getInventoryDashboardData'
 )
+
   .then(function(response) {
 
-    console.log(
-      'Inventory API response:',
-      response.status
-    );
-
     if (!response.ok) {
+
       throw new Error(
-        'Unable to connect to PPE backend.'
+        'Unable to connect to PPE backend. HTTP ' +
+        response.status
       );
+
     }
 
     return response.json();
 
   })
+
   .then(function(data) {
 
     console.log(
-      'Inventory API data:',
+      'Inventory Dashboard API:',
       data
     );
 
@@ -1070,9 +1070,13 @@
     inventoryDashboardState.transactionPage =
       1;
 
+    inventoryDashboardState.transactionHistoryPage =
+      1;
+
     renderDashboard(data);
 
   })
+
   .catch(function(error) {
 
     console.error(
@@ -1095,9 +1099,10 @@
         'block';
 
     }
+
   });
 
-  } 
+  
 
 
   /*

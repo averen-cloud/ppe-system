@@ -1,0 +1,1282 @@
+<style>
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .header {
+      background: #1f4e78;
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      margin: 0 0 5px 0;
+      font-size: 25px;
+    }
+
+    .header p {
+      margin: 0;
+      opacity: 0.9;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #1f4e78;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    button {
+      border: none;
+      border-radius: 6px;
+      padding: 11px 20px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .btn-search {
+      background: #1f4e78;
+      color: white;
+    }
+
+    .btn-search:hover {
+      background: #173a5b;
+    }
+
+    .btn-release {
+      background: #38761d;
+      color: white;
+      width: 100%;
+      margin-top: 15px;
+      font-size: 16px;
+      padding: 13px;
+    }
+
+    .btn-release:hover {
+      background: #274e13;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .info-item {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 6px;
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .info-value {
+      font-weight: bold;
+      color: #222;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 15px;
+      background: #d9ead3;
+      color: #274e13;
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th {
+      background: #1f4e78;
+      color: white;
+      padding: 10px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      font-size: 13px;
+    }
+
+    td input {
+      width: 100px;
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .message-error {
+      background: #f4cccc;
+      color: #990000;
+    }
+
+    .message-success {
+      background: #d9ead3;
+      color: #274e13;
+    }
+
+    .loading {
+      display: none;
+      margin-top: 15px;
+      color: #666;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 700px) {
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .search-row {
+        flex-direction: column;
+      }
+
+      .search-input {
+        width: 100%;
+      }
+
+      .btn-search {
+        width: 100%;
+      }
+
+    }
+
+  </style>
+
+
+
+
+<div class="container">
+
+  <!-- HEADER -->
+
+  <div class="header">
+
+    <h1>PPE Issuance</h1>
+
+    <p>
+      PPE Release / Issuance Management
+    </p>
+
+  </div>
+
+
+  <!-- SEARCH REQUEST -->
+
+  <div class="card">
+
+    <div class="section-title">
+      1. Find Approved PPE Request
+    </div>
+
+    <div class="search-row">
+
+      <select
+        id="requestId"
+        class="search-input"
+      >
+      <option value="">
+        Loading approved requests...
+      </option>
+      </select>
+
+      <button
+       type="button"
+       class="btn-search"
+       onclick="findRequest(); return false;"
+      >
+  Find Request
+</button>
+
+    </div>
+
+    <div
+      id="loadingMessage"
+      class="loading"
+    >
+      Searching request...
+    </div>
+
+    <div
+      id="errorMessage"
+      class="message message-error"
+    ></div>
+
+  </div>
+
+
+  <!-- REQUEST INFORMATION -->
+
+  <div
+    id="requestSection"
+    class="card hidden"
+  >
+
+    <div class="section-title">
+      2. Request Information
+    </div>
+
+    <div class="info-grid">
+
+      <div class="info-item">
+
+        <div class="info-label">
+          Request ID
+        </div>
+
+        <div
+          id="displayRequestId"
+          class="info-value"
+        ></div>
+
+      </div>
+
+
+      <div class="info-item">
+
+        <div class="info-label">
+          Requestor
+        </div>
+
+        <div
+          id="displayRequestor"
+          class="info-value"
+        ></div>
+
+      </div>
+
+
+      <div class="info-item">
+
+        <div class="info-label">
+          Employee Number
+        </div>
+
+        <div
+          id="displayEmployeeNumber"
+          class="info-value"
+        ></div>
+
+      </div>
+
+
+      <div class="info-item">
+
+        <div class="info-label">
+          Employee Name
+        </div>
+
+        <div
+          id="displayEmployeeName"
+          class="info-value"
+        ></div>
+
+      </div>
+
+
+      <div class="info-item">
+
+        <div class="info-label">
+          Department
+        </div>
+
+        <div
+          id="displayDepartment"
+          class="info-value"
+        ></div>
+
+      </div>
+
+
+      <div class="info-item">
+
+        <div class="info-label">
+          Project Code
+        </div>
+
+        <div
+          id="displayProjectCode"
+          class="info-value"
+        ></div>
+
+      </div>
+
+
+      <div class="info-item">
+
+        <div class="info-label">
+          Project Site
+        </div>
+
+        <div
+          id="displayProjectSite"
+          class="info-value"
+        ></div>
+
+      </div>
+
+
+      <div class="info-item">
+
+        <div class="info-label">
+          Current Status
+        </div>
+
+        <div>
+
+          <span
+            id="displayStatus"
+            class="status"
+          ></span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- PPE ITEMS -->
+
+  <div
+    id="itemsSection"
+    class="card hidden"
+  >
+
+    <div class="section-title">
+      3. PPE Items for Release
+    </div>
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+                <th>Item No</th>
+                <th>PPE Item</th>
+                <th>Requested Qty</th>
+                <th>Already Released</th>
+                <th>Release Now</th>
+                <th>Remaining Balance</th>
+          </tr>
+
+        </thead>
+
+        <tbody
+          id="itemsTableBody"
+        ></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- RELEASE INFORMATION -->
+
+  <div
+    id="releaseSection"
+    class="card hidden"
+  >
+
+    <div class="section-title">
+      4. Release Information
+    </div>
+
+
+    <label>
+      Released By
+    </label>
+
+    <input
+      type="text"
+      id="issuanceReleasedBy"
+      placeholder="Enter name of PPE Custodian / Admin"
+    >
+
+
+    <br><br>
+
+
+    <label>
+      Remarks
+    </label>
+
+    <textarea
+      id="issuanceRemarks"
+      rows="3"
+      placeholder="Optional remarks"
+    ></textarea>
+
+
+    <button
+      class="btn-release"
+      onclick="releasePPE()"
+    >
+      Release PPE
+    </button>
+
+
+    <div
+      id="successMessage"
+      class="message message-success"
+    ></div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  let currentRequest = null;
+
+
+// ============================================
+// LOAD APPROVED REQUEST IDs
+// ============================================
+
+function loadApprovedRequests() {
+
+  const dropdown =
+    document.getElementById('requestId');
+
+  dropdown.innerHTML =
+    '<option value="">Loading approved requests...</option>';
+
+
+  google.script.run
+
+    .withSuccessHandler(function(requestIds) {
+
+      dropdown.innerHTML =
+        '<option value="">Select an approved Request ID</option>';
+
+
+      if (
+        !requestIds ||
+        requestIds.length === 0
+      ) {
+
+        dropdown.innerHTML =
+          '<option value="">No approved requests available</option>';
+
+        return;
+
+      }
+
+
+      requestIds.forEach(function(requestId) {
+
+        const option =
+          document.createElement('option');
+
+        option.value =
+          requestId;
+
+        option.textContent =
+          requestId;
+
+        dropdown.appendChild(option);
+
+      });
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      dropdown.innerHTML =
+        '<option value="">Unable to load requests</option>';
+
+      showError(
+        'Unable to load approved requests: ' +
+        error.message
+      );
+
+    })
+
+    .getApprovedRequestsForIssuance();
+
+}
+
+
+// ============================================
+// FIND APPROVED REQUEST
+// ============================================
+
+function findRequest() {
+
+  const requestId =
+    document
+      .getElementById('requestId')
+      .value
+      .trim();
+
+  hideMessages();
+
+  if (!requestId) {
+
+    showError(
+      'Please select a Request ID.'
+    );
+
+    return;
+
+  }
+
+  document
+    .getElementById('loadingMessage')
+    .style.display = 'block';
+
+
+  google.script.run
+
+    .withSuccessHandler(function(result) {
+
+      document
+        .getElementById('loadingMessage')
+        .style.display = 'none';
+
+      /*
+       * TEMPORARY DIAGNOSTIC
+       * Show exactly what the server returned.
+       */
+
+      if (!result) {
+
+        showError(
+          'Server returned NULL for Request ID: ' +
+          requestId
+        );
+
+        return;
+
+      }
+
+      if (!Array.isArray(result)) {
+
+        showError(
+          'Server returned an unexpected result for ' +
+          requestId +
+          ': ' +
+          JSON.stringify(result)
+        );
+
+        return;
+
+      }
+
+      if (result.length === 0) {
+
+        showError(
+          'Server returned 0 rows for Request ID: ' +
+          requestId
+        );
+
+        return;
+
+      }
+
+      currentRequest = result;
+
+      displayRequest(result);
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      document
+        .getElementById('loadingMessage')
+        .style.display = 'none';
+
+      showError(
+        'Server error: ' +
+        error.message
+      );
+
+    })
+
+    .loadApprovedRequestForIssuance(
+       requestId
+    );
+
+}
+
+
+  // ============================================
+  // DISPLAY REQUEST
+  // ============================================
+
+  function displayRequest(rows) {
+
+  if (
+    !rows ||
+    rows.length === 0
+  ) {
+
+    showError(
+      'No PPE items found for this request.'
+    );
+
+    return;
+
+  }
+
+  const firstRow =
+    rows[0];
+
+
+  // ============================================
+  // REQUEST DETAILS
+  // ============================================
+
+  document
+    .getElementById('displayRequestId')
+    .textContent =
+    firstRow['Request ID'] || '';
+
+  document
+    .getElementById('displayRequestor')
+    .textContent =
+    firstRow['Requestor'] || '';
+
+  document
+    .getElementById('displayEmployeeNumber')
+    .textContent =
+    firstRow['Employee Number'] || '';
+
+  document
+    .getElementById('displayEmployeeName')
+    .textContent =
+    firstRow['Employee Name'] || '';
+
+  document
+    .getElementById('displayDepartment')
+    .textContent =
+    firstRow['Department'] || '';
+
+  document
+    .getElementById('displayProjectCode')
+    .textContent =
+    firstRow['Project Code'] || '';
+
+  document
+    .getElementById('displayProjectSite')
+    .textContent =
+    firstRow['Project Site'] || '';
+
+  document
+    .getElementById('displayStatus')
+    .textContent =
+    firstRow['Current Status'] || '';
+
+
+  // ============================================
+  // PPE ITEMS
+  // ============================================
+
+  const tbody =
+    document
+      .getElementById(
+        'itemsTableBody'
+      );
+
+  tbody.innerHTML = '';
+
+
+  rows.forEach(
+    function(row, index) {
+
+      const requestedQty =
+        Number(
+          row['Quantity']
+        ) || 0;
+
+      const alreadyReleased =
+        Number(
+          row['Already Released Qty']
+        ) || 0;
+
+      const balanceQty =
+        Number(
+          row['Balance Qty']
+        ) || 0;
+
+
+      const tr =
+        document.createElement(
+          'tr'
+        );
+
+
+      tr.innerHTML = `
+
+        <td>
+          ${escapeHtml(
+            row['Item No'] || ''
+          )}
+        </td>
+
+        <td>
+          ${escapeHtml(
+            row['PPE Item'] || ''
+          )}
+        </td>
+
+        <td>
+          ${requestedQty}
+        </td>
+
+        <td>
+          ${alreadyReleased}
+        </td>
+
+        <td>
+
+          <input
+            type="number"
+            min="0"
+            max="${balanceQty}"
+            value="${balanceQty}"
+            class="releasedQty"
+            data-index="${index}"
+          >
+
+        </td>
+
+        <td>
+
+          <span
+            class="balance"
+            data-index="${index}"
+          >
+            ${balanceQty}
+          </span>
+
+        </td>
+
+      `;
+
+
+      tbody.appendChild(
+        tr
+      );
+
+    }
+  );
+
+
+  attachQuantityEvents();
+
+
+  // ============================================
+  // SHOW SECTIONS
+  // ============================================
+
+  document
+    .getElementById(
+      'requestSection'
+    )
+    .classList
+    .remove('hidden');
+
+  document
+    .getElementById(
+      'itemsSection'
+    )
+    .classList
+    .remove('hidden');
+
+  document
+    .getElementById(
+      'releaseSection'
+    )
+    .classList
+    .remove('hidden');
+
+}
+
+
+  // ============================================
+  // RELEASE QTY / BALANCE
+  // ============================================
+
+  function attachQuantityEvents() {
+
+    const inputs =
+      document.querySelectorAll(
+        '.releasedQty'
+      );
+
+
+    inputs.forEach(function(input) {
+
+      input.addEventListener(
+        'input',
+        function() {
+
+          const index =
+            Number(
+              input.dataset.index
+            );
+
+          const requested =
+            Number(
+              currentRequest[index]['Quantity']
+            ) || 0;
+
+          const alreadyReleased =
+            Number(
+              currentRequest[index]['Already Released Qty']
+            ) || 0;
+
+          const availableBalance =
+            Math.max(
+              requested -
+              alreadyReleased,
+              0
+            );
+
+
+          let released =
+            Number(
+              input.value
+            ) || 0;
+
+
+          // Prevent negative quantity
+
+          if (released < 0) {
+
+            released = 0;
+
+            input.value = 0;
+
+          }
+
+
+          // Prevent releasing more than
+          // the remaining balance
+
+          if (
+            released >
+            availableBalance
+          ) {
+
+            released =
+              availableBalance;
+
+            input.value =
+              availableBalance;
+
+          }
+
+
+          // Remaining balance AFTER
+          // this issuance
+
+          const balance =
+            availableBalance -
+            released;
+
+
+          const balanceElement =
+            document.querySelector(
+              `.balance[data-index="${index}"]`
+            );
+
+
+          if (balanceElement) {
+
+            balanceElement.textContent =
+              balance;
+
+          }
+
+        }
+      );
+
+    });
+
+  }
+
+
+  // ============================================
+// RELEASE PPE
+// ============================================
+
+function releasePPE() {
+
+  hideMessages();
+
+  if (
+    !currentRequest ||
+    !Array.isArray(currentRequest) ||
+    currentRequest.length === 0
+  ) {
+
+    showError(
+      'Please find an approved PPE request first.'
+    );
+
+    return;
+
+  }
+
+  const requestId =
+    document
+      .getElementById('requestId')
+      .value
+      .trim();
+
+  if (!requestId) {
+
+    showError(
+      'Please select a Request ID.'
+    );
+
+    return;
+
+  }
+
+  const releasedInputs =
+    document.querySelectorAll(
+      '.releasedQty'
+    );
+
+  const issuanceItems = [];
+
+  currentRequest.forEach(function(row, index) {
+
+    const requestedQty =
+      Number(row['Quantity']) || 0;
+
+    const input =
+      releasedInputs[index];
+
+    const releasedQty =
+      Number(input.value) || 0;
+
+    if (releasedQty < 0) {
+
+      throw new Error(
+        'Released quantity cannot be negative.'
+      );
+
+    }
+
+    if (releasedQty > requestedQty) {
+
+      throw new Error(
+        'Released quantity for ' +
+        row['PPE Item'] +
+        ' cannot exceed requested quantity.'
+      );
+
+    }
+
+    issuanceItems.push({
+
+      itemNo:
+        row['Item No'] || '',
+
+      ppeItem:
+        row['PPE Item'] || '',
+
+      requestedQty:
+        requestedQty,
+
+      releasedQty:
+        releasedQty,
+
+      balanceQty:
+        requestedQty - releasedQty
+
+    });
+
+  });
+
+  if (issuanceItems.length === 0) {
+
+    showError(
+      'No PPE items available for issuance.'
+    );
+
+    return;
+
+  }
+
+  const releasedBy =
+    document
+      .getElementById('issuanceReleasedBy')
+      ?.value
+      ?.trim() || '';
+
+  const remarksElement =
+  document.getElementById('issuanceRemarks');
+
+  const remarks = remarksElement
+  ? String(remarksElement.value || '').trim()
+  : '';
+
+  console.log('REMARKS FROM FORM:', remarks);
+
+  const issuanceData = {  
+
+    requestId:
+      requestId,
+
+    releaseDate:
+      new Date().toISOString(),
+
+    employeeNumber:
+      currentRequest[0]['Employee Number'] || '',
+
+    employeeName:
+      currentRequest[0]['Employee Name'] || '',
+
+    department:
+      currentRequest[0]['Department'] || '',
+
+    projectCode:
+      currentRequest[0]['Project Code'] || '',
+
+    projectSite:
+      currentRequest[0]['Project Site'] || '',
+
+    releasedBy:
+      releasedBy,
+
+    remarks:
+      remarks,
+
+    items:
+      issuanceItems
+
+  };
+
+  const button =
+    document.querySelector(
+      '.btn-release'
+    );
+
+  if (button) {
+
+    button.disabled = true;
+
+    button.textContent =
+      'Saving...';
+
+  }
+
+  google.script.run
+
+    .withSuccessHandler(function(result) {
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.textContent =
+          'Release PPE';
+
+      }
+
+      showSuccess(
+        result.message ||
+        'PPE issuance saved successfully.'
+      );
+
+      // Refresh the approved request list
+      loadApprovedRequests();
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.textContent =
+          'Release PPE';
+
+      }
+
+      showError(
+        error.message ||
+        'Unable to save PPE issuance.'
+      );
+
+    })
+
+    .savePPEIssuance(
+      issuanceData
+  );
+
+}
+
+
+  // ============================================
+  // ERROR
+  // ============================================
+
+  function showError(message) {
+
+    const element =
+      document.getElementById(
+        'errorMessage'
+      );
+
+    element.textContent =
+      message;
+
+    element.style.display =
+      'block';
+
+  }
+
+
+  // ============================================
+  // SUCCESS
+  // ============================================
+
+  function showSuccess(message) {
+
+    const element =
+      document.getElementById(
+        'successMessage'
+      );
+
+    element.textContent =
+      message;
+
+    element.style.display =
+      'block';
+
+  }
+
+
+  // ============================================
+  // HIDE MESSAGES
+  // ============================================
+
+  function hideMessages() {
+
+    document
+      .getElementById('errorMessage')
+      .style.display = 'none';
+
+
+    document
+      .getElementById('successMessage')
+      .style.display = 'none';
+
+  }
+
+
+  // ============================================
+  // HTML ESCAPE
+  // ============================================
+
+  function escapeHtml(value) {
+
+    return String(value)
+
+      .replace(/&/g, '&amp;')
+
+      .replace(/</g, '&lt;')
+
+      .replace(/>/g, '&gt;')
+
+      .replace(/"/g, '&quot;')
+
+      .replace(/'/g, '&#039;');
+
+  }
+
+
+  // ============================================
+// LOAD APPROVED REQUESTS WHEN PAGE OPENS
+// ============================================
+
+function initializeIssuance() {
+
+  loadApprovedRequests();
+
+}
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+

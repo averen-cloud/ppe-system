@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 
-  <base target="_top">
+  <meta charset="UTF-8">
 
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  <title>PPE Admin Portal</title>
+  <title>PPE Management Portal</title>
 
   <style>
 
@@ -23,242 +24,215 @@
       color: #1f2937;
     }
 
-    /* =========================
-       HEADER
-    ========================= */
-
     .header {
-      background: #173f2f;
+      background: #0f172a;
       color: white;
-      padding: 20px 25px;
+      padding: 22px 30px;
     }
 
-    .header-title {
-      font-size: 24px;
-      font-weight: bold;
+    .header h1 {
+      margin: 0;
+      font-size: 26px;
     }
 
-    .header-subtitle {
-      margin-top: 5px;
-      font-size: 13px;
-      opacity: 0.85;
+    .header p {
+      margin: 6px 0 0;
+      color: #cbd5e1;
+      font-size: 14px;
     }
-
-
-    /* =========================
-       TABS
-    ========================= */
 
     .tabs {
-      background: white;
       display: flex;
-      gap: 5px;
-      padding: 10px 20px 0;
-      border-bottom: 1px solid #d9dee3;
-      overflow-x: auto;
+      gap: 8px;
+      padding: 14px 20px;
+      background: white;
+      border-bottom: 1px solid #ddd;
+      flex-wrap: wrap;
     }
 
     .tab-button {
       border: none;
-      background: transparent;
-      padding: 13px 18px;
-      font-size: 14px;
-      font-weight: bold;
-      color: #64748b;
+      background: #e5e7eb;
+      color: #374151;
+      padding: 11px 18px;
+      border-radius: 7px;
       cursor: pointer;
-      border-bottom: 3px solid transparent;
-      white-space: nowrap;
+      font-size: 14px;
+      font-weight: 600;
     }
 
     .tab-button:hover {
-      color: #173f2f;
-      background: #f5f7f8;
+      background: #d1d5db;
     }
 
     .tab-button.active {
-      color: #173f2f;
-      border-bottom: 3px solid #173f2f;
-    }
-
-
-    /* =========================
-       CONTENT
-    ========================= */
-
-    .content {
-      padding: 25px;
+      background: #0f172a;
+      color: white;
     }
 
     .tab-content {
       display: none;
+      width: 100%;
     }
 
     .tab-content.active {
       display: block;
     }
 
+    .iframe-container {
+      width: 100%;
+      min-height: 1200px;
+      background: white;
+    }
 
-    /* =========================
-       MOBILE
-    ========================= */
+    .iframe-container iframe {
+      width: 100%;
+      min-height: 1200px;
+      border: none;
+      display: block;
+      background: white;
+    }
 
-    @media (max-width: 700px) {
-
-      .header {
-        padding: 18px;
-      }
-
-      .header-title {
-        font-size: 20px;
-      }
-
-      .content {
-        padding: 15px;
-      }
-
-      .tabs {
-        padding-left: 10px;
-        padding-right: 10px;
-      }
-
-      .tab-button {
-        padding: 12px 14px;
-      }
-
+    .coming-soon {
+      margin: 30px;
+      padding: 30px;
+      background: white;
+      border-radius: 10px;
+      text-align: center;
+      color: #64748b;
     }
 
   </style>
 
 </head>
 
-
 <body>
 
-
-  <!-- =========================
-       HEADER
-  ========================= -->
+  <!-- ========================= -->
+  <!-- HEADER -->
+  <!-- ========================= -->
 
   <div class="header">
 
-    <div class="header-title">
+    <h1>
       🛡 PPE Management Portal
-    </div>
+    </h1>
 
-    <div class="header-subtitle">
+    <p>
       PPE Inventory, Stock Receipt and Issuance Management
-    </div>
+    </p>
 
   </div>
 
 
-  <!-- =========================
-       TABS
-  ========================= -->
+  <!-- ========================= -->
+  <!-- TABS -->
+  <!-- ========================= -->
 
   <div class="tabs">
 
     <button
       class="tab-button active"
-      onclick="openTab('inventory', this)">
-
+      onclick="openTab('inventory', this)"
+    >
       📊 Inventory Dashboard
-
     </button>
-
 
     <button
       class="tab-button"
-      onclick="openTab('receipt', this)">
+      onclick="openTab('receipt', this)"
+    >
+      📥 Stock Receipt
+    </button>
+
+    <button
+      class="tab-button"
+      onclick="openTab('issuance', this)"
+    >
+      📤 PPE Issuance
+    </button>
+
+  </div>
+
+
+  <!-- ========================= -->
+  <!-- INVENTORY DASHBOARD -->
+  <!-- ========================= -->
+
+  <div
+    id="inventory"
+    class="tab-content active"
+  >
+
+    <div class="iframe-container">
+
+      <iframe
+        src="InventoryDashboardContent.html"
+        title="Inventory Dashboard"
+      ></iframe>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================= -->
+  <!-- STOCK RECEIPT -->
+  <!-- ========================= -->
+
+  <div
+    id="receipt"
+    class="tab-content"
+  >
+
+    <div class="coming-soon">
 
       📥 Stock Receipt
 
-    </button>
+      <br><br>
+
+      Stock Receipt module will be connected
+      to the PPE backend next.
+
+    </div>
+
+  </div>
 
 
-    <button
-      class="tab-button"
-      onclick="openTab('issuance', this)">
+  <!-- ========================= -->
+  <!-- PPE ISSUANCE -->
+  <!-- ========================= -->
+
+  <div
+    id="issuance"
+    class="tab-content"
+  >
+
+    <div class="coming-soon">
 
       📤 PPE Issuance
 
-    </button>
+      <br><br>
+
+      PPE Issuance module will be connected
+      to the PPE backend next.
+
+    </div>
 
   </div>
 
 
-  <!-- =========================
-       MAIN CONTENT
-  ========================= -->
-
-  <div class="content">
-
-
-    <!-- =========================
-         INVENTORY DASHBOARD
-    ========================= -->
-
-   <div id="inventory" class="tab-content active">
-
-  <iframe
-    src="InventoryDashboardContent.html"
-    style="
-      width:100%;
-      min-height:1200px;
-      border:none;
-      display:block;
-    "
-  ></iframe>
-
-</div>
-
-
-    <!-- =========================
-         STOCK RECEIPT
-    ========================= -->
-
-    <div
-      id="receipt"
-      class="tab-content">
-
-      <?!= include('StockReceiptContent'); ?>
-
-    </div>
-
-
-    <!-- =========================
-         PPE ISSUANCE
-    ========================= -->
-
-    <div
-      id="issuance"
-      class="tab-content">
-
-      <?!= include('IssuanceContent'); ?>
-
-    </div>
-
-
-  </div>
-
-
-  <!-- =========================
-       ADMIN PORTAL SCRIPT
-  ========================= -->
+  <!-- ========================= -->
+  <!-- TAB FUNCTION -->
+  <!-- ========================= -->
 
   <script>
 
-<script>
-
-
-
-</script>
-    
     function openTab(tabId, button) {
 
-      /* =========================
-         HIDE ALL TABS
-      ========================= */
+      /*
+       * HIDE ALL TABS
+       */
 
       const contents =
         document.querySelectorAll(
@@ -276,9 +250,9 @@
       );
 
 
-      /* =========================
-         REMOVE ACTIVE BUTTONS
-      ========================= */
+      /*
+       * REMOVE ACTIVE BUTTONS
+       */
 
       const buttons =
         document.querySelectorAll(
@@ -296,12 +270,14 @@
       );
 
 
-      /* =========================
-         SHOW SELECTED TAB
-      ========================= */
+      /*
+       * SHOW SELECTED TAB
+       */
 
       const selectedTab =
-        document.getElementById(tabId);
+        document.getElementById(
+          tabId
+        );
 
       if (selectedTab) {
 
@@ -312,9 +288,9 @@
       }
 
 
-      /* =========================
-         ACTIVATE BUTTON
-      ========================= */
+      /*
+       * ACTIVATE BUTTON
+       */
 
       if (button) {
 
@@ -324,68 +300,9 @@
 
       }
 
-
-      /* =========================
-         INITIALIZE STOCK RECEIPT
-      ========================= */
-
-      if (
-        tabId === 'receipt' &&
-        typeof initializeStockReceipt === 'function'
-      ) {
-
-        initializeStockReceipt();
-
-      }
-
-
-      /* =========================
-         INITIALIZE PPE ISSUANCE
-      ========================= */
-
-      if (
-        tabId === 'issuance' &&
-        typeof initializeIssuance === 'function'
-      ) {
-
-        initializeIssuance();
-
-      }
-
     }
 
   </script>
 
-
 </body>
-
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1032,31 +1032,25 @@
       '<div class="loading">Loading transactions...</div>';
 
 
-    fetch(
-  'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec?api=getInventoryDashboardData'
-)
+    /*
+ * ==========================================================
+ * LOAD DASHBOARD DATA THROUGH JSONP
+ * ==========================================================
+ */
 
-  .then(function(response) {
+const callbackName =
+  'inventoryDashboardCallback_' +
+  Date.now();
 
-    if (!response.ok) {
 
-      throw new Error(
-        'Unable to connect to PPE backend. HTTP ' +
-        response.status
-      );
-
-    }
-
-    return response.json();
-
-  })
-
-  .then(function(data) {
+window[callbackName] =
+  function(data) {
 
     console.log(
       'Inventory Dashboard API:',
       data
     );
+
 
     inventoryDashboardState.data =
       data;
@@ -1073,26 +1067,75 @@
     inventoryDashboardState.transactionHistoryPage =
       1;
 
+
     renderDashboard(data);
 
-  })
 
-  .catch(function(error) {
+    if (refreshButton) {
+
+      refreshButton.disabled =
+        false;
+
+      refreshButton.textContent =
+        'Refresh';
+
+    }
+
+
+    delete window[callbackName];
+
+    if (script.parentNode) {
+
+      script.parentNode.removeChild(
+        script
+      );
+
+    }
+
+  };
+
+
+const script =
+  document.createElement(
+    'script'
+  );
+
+
+script.src =
+  'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec' +
+  '?api=getInventoryDashboardData' +
+  '&callback=' +
+  callbackName;
+
+
+script.onerror =
+  function() {
 
     console.error(
-      'Inventory Dashboard Error:',
-      error
+      'Inventory Dashboard API failed.'
     );
+
+
+    if (refreshButton) {
+
+      refreshButton.disabled =
+        false;
+
+      refreshButton.textContent =
+        'Refresh';
+
+    }
+
 
     const message =
       document.getElementById(
         'inventoryDashboardMessage'
       );
 
+
     if (message) {
 
       message.textContent =
-        error.message ||
         'Unable to load Inventory Dashboard.';
 
       message.style.display =
@@ -1100,7 +1143,15 @@
 
     }
 
-  });
+
+    delete window[callbackName];
+
+  };
+
+
+document.body.appendChild(
+  script
+);
 
   }
 

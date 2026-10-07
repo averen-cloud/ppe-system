@@ -1126,6 +1126,7 @@
 // ============================================
 
 
+
 // ============================================
 // RELEASE PPE
 // ============================================
@@ -1326,10 +1327,6 @@ function releasePPE() {
   };
 
 
-  // ============================================
-  // SHOW SAVING MESSAGE
-  // ============================================
-
   const releaseButton =
     document.querySelector(
       '.btn-release'
@@ -1338,7 +1335,8 @@ function releasePPE() {
 
   if (releaseButton) {
 
-    releaseButton.disabled = true;
+    releaseButton.disabled =
+      true;
 
     releaseButton.textContent =
       'Saving...';
@@ -1350,26 +1348,31 @@ function releasePPE() {
   // SEND TO GOOGLE APPS SCRIPT
   // ============================================
 
+  const formData =
+    new URLSearchParams();
+
+
+  formData.append(
+    'api',
+    'savePPEIssuance'
+  );
+
+
+  formData.append(
+    'data',
+    JSON.stringify(
+      issuanceData
+    )
+  );
+
+
   fetch(
     API_URL,
     {
       method: 'POST',
 
-      headers: {
-        'Content-Type':
-          'text/plain;charset=utf-8'
-      },
-
-      body: JSON.stringify({
-
-        action:
-          'savePPEIssuance',
-
-        data:
-          issuanceData
-
-      })
-
+      body:
+        formData
     }
   )
   .then(
@@ -1423,7 +1426,6 @@ function releasePPE() {
       );
 
 
-      // Disable release button
       if (releaseButton) {
 
         releaseButton.disabled =
@@ -1435,11 +1437,11 @@ function releasePPE() {
       }
 
 
-      // Refresh Request Information status
       const statusElement =
         document.getElementById(
           'displayStatus'
         );
+
 
       if (statusElement) {
 
@@ -1482,6 +1484,7 @@ function releasePPE() {
   );
 
 }
+
 
   
   // ============================================

@@ -996,79 +996,59 @@
 
   function loadDashboard() {
 
-    console.log('Inventory Dashboard loadDashboard started');
+  console.log(
+    'Inventory Dashboard loadDashboard started'
+  );
 
-    const refreshButton =
-      document.getElementById(
-        'inventoryDashboardRefreshButton'
-      );
-
-
-    if (refreshButton) {
-
-      refreshButton.disabled = true;
-
-      refreshButton.textContent =
-        'Loading...';
-
-    }
-
-
+  const refreshButton =
     document.getElementById(
-      'inventoryContainer'
-    ).innerHTML =
-      '<div class="loading">Loading inventory...</div>';
-
-
-    document.getElementById(
-      'inventorySummaryContainer'
-    ).innerHTML =
-      '<div class="loading">Loading summary...</div>';
-
-
-    document.getElementById(
-      'transactionContainer'
-    ).innerHTML =
-      '<div class="loading">Loading transactions...</div>';
-
-
-    /*
- * ==========================================================
- * LOAD DASHBOARD DATA THROUGH JSONP
- * ==========================================================
- */
-
-const callbackName =
-  'inventoryDashboardCallback_' +
-  Date.now();
-
-
-window[callbackName] =
-  function(data) {
-
-    console.log(
-      'Inventory Dashboard API:',
-      data
+      'inventoryDashboardRefreshButton'
     );
 
 
-    inventoryDashboardState.data =
-      data;
+  if (refreshButton) {
 
-    inventoryDashboardState.summaryPage =
-      1;
+    refreshButton.disabled = true;
 
-    inventoryDashboardState.inventoryPage =
-      1;
+    refreshButton.textContent =
+      'Loading...';
 
-    inventoryDashboardState.transactionPage =
-      1;
-
-    inventoryDashboardState.transactionHistoryPage =
-      1;
+  }
 
 
-    renderDashboard(data);
+  document.getElementById(
+    'inventoryContainer'
+  ).innerHTML =
+    '<div class="loading">Loading inventory...</div>';
+
+
+  document.getElementById(
+    'inventorySummaryContainer'
+  ).innerHTML =
+    '<div class="loading">Loading summary...</div>';
+
+
+  document.getElementById(
+    'transactionContainer'
+  ).innerHTML =
+    '<div class="loading">Loading transactions...</div>';
+
+
+  const callbackName =
+    'inventoryDashboardCallback_' +
+    Date.now();
+
+
+  let finished = false;
+
+
+  function finishLoading() {
+
+    if (finished) {
+      return;
+    }
+
+    finished = true;
 
 
     if (refreshButton) {
@@ -1081,79 +1061,144 @@ window[callbackName] =
 
     }
 
+  }
 
-    delete window[callbackName];
 
-    if (script.parentNode) {
+  window[callbackName] =
+    function(data) {
 
-      script.parentNode.removeChild(
-        script
+      console.log(
+        'Inventory Dashboard API:',
+        data
       );
 
-    }
 
-  };
+      try {
+
+        inventoryDashboardState.data =
+          data;
+
+        inventoryDashboardState.summaryPage =
+          1;
+
+        inventoryDashboardState.inventoryPage =
+          1;
+
+        inventoryDashboardState.transactionPage =
+          1;
+
+        inventoryDashboardState.transactionHistoryPage =
+          1;
 
 
-const script =
-  document.createElement(
-    'script'
+        renderDashboard(data);
+
+
+        finishLoading();
+
+
+        delete window[callbackName];
+
+
+        if (script.parentNode) {
+
+          script.parentNode.removeChild(
+            script
+          );
+
+        }
+
+      } catch (error) {
+
+        console.error(
+          'Dashboard render error:',
+          error
+        );
+
+
+        finishLoading();
+
+
+        alert(
+          'Inventory Dashboard error: ' +
+          error.message
+        );
+
+      }
+
+    };
+
+
+  const script =
+    document.createElement(
+      'script'
+    );
+
+
+  script.src =
+    'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec' +
+    '?api=getInventoryDashboardData' +
+    '&callback=' +
+    callbackName;
+
+
+  script.onerror =
+    function() {
+
+      console.error(
+        'Inventory Dashboard API failed.'
+      );
+
+
+      finishLoading();
+
+
+      delete window[callbackName];
+
+
+      alert(
+        'Unable to load Inventory Dashboard.'
+      );
+
+    };
+
+
+  document.body.appendChild(
+    script
   );
 
 
-script.src =
-  'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec' +
-  '?api=getInventoryDashboardData' +
-  '&callback=' +
-  callbackName;
+  /*
+   * SAFETY TIMEOUT
+   */
+
+  setTimeout(
+    function() {
+
+      if (!finished) {
+
+        console.error(
+          'Inventory Dashboard API timeout.'
+        );
 
 
-script.onerror =
-  function() {
-
-    console.error(
-      'Inventory Dashboard API failed.'
-    );
+        finishLoading();
 
 
-    if (refreshButton) {
-
-      refreshButton.disabled =
-        false;
-
-      refreshButton.textContent =
-        'Refresh';
-
-    }
+        delete window[callbackName];
 
 
-    const message =
-      document.getElementById(
-        'inventoryDashboardMessage'
-      );
+        alert(
+          'Inventory Dashboard is taking too long to load.'
+        );
 
+      }
 
-    if (message) {
+    },
+    15000
+  );
 
-      message.textContent =
-        'Unable to load Inventory Dashboard.';
-
-      message.style.display =
-        'block';
-
-    }
-
-
-    delete window[callbackName];
-
-  };
-
-
-document.body.appendChild(
-  script
-);
-
-  }
+}
 
 
   /*

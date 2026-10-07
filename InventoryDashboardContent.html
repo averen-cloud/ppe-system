@@ -989,12 +989,12 @@
 
 
   /*
-   * ==========================================================
-   * LOAD DASHBOARD
-   * ==========================================================
-   */
+ * ==========================================================
+ * LOAD DASHBOARD
+ * ==========================================================
+ */
 
-  function loadDashboard() {
+function loadDashboard() {
 
   console.log(
     'Inventory Dashboard loadDashboard started'
@@ -1028,6 +1028,49 @@
     );
 
 
+  let completed = false;
+
+
+  /*
+   * ==========================================================
+   * CLEANUP
+   * ==========================================================
+   */
+
+  function cleanup() {
+
+    if (completed) {
+
+      return;
+
+    }
+
+
+    completed = true;
+
+
+    delete window[callbackName];
+
+
+    if (
+      script.parentNode
+    ) {
+
+      script.parentNode.removeChild(
+        script
+      );
+
+    }
+
+  }
+
+
+  /*
+   * ==========================================================
+   * SUCCESS CALLBACK
+   * ==========================================================
+   */
+
   window[callbackName] =
     function(data) {
 
@@ -1037,16 +1080,35 @@
       );
 
 
+      if (completed) {
+
+        return;
+
+      }
+
+
       try {
+
+        if (!data) {
+
+          throw new Error(
+            'No dashboard data returned.'
+          );
+
+        }
+
 
         inventoryDashboardState.data =
           data;
 
+
         inventoryDashboardState.summaryPage =
           1;
 
+
         inventoryDashboardState.inventoryPage =
           1;
+
 
         inventoryDashboardState.transactionPage =
           1;
@@ -1058,6 +1120,12 @@
         ) {
 
           renderDashboard(data);
+
+        } else {
+
+          throw new Error(
+            'renderDashboard function not found.'
+          );
 
         }
 
@@ -1080,11 +1148,6 @@
           error
         );
 
-        alert(
-          'Dashboard render error: ' +
-          error.message
-        );
-
 
         if (refreshButton) {
 
@@ -1096,31 +1159,40 @@
 
         }
 
-      }
 
-
-      delete window[callbackName];
-
-
-      if (
-        script.parentNode
-      ) {
-
-        script.parentNode.removeChild(
-          script
+        alert(
+          'Dashboard render error: ' +
+          error.message
         );
 
       }
 
+
+      cleanup();
+
     };
 
+
+  /*
+   * ==========================================================
+   * API URL
+   * ==========================================================
+   */
 
   script.src =
     'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec' +
     '?api=getInventoryDashboardData' +
     '&callback=' +
-    callbackName;
+    encodeURIComponent(
+      callbackName
+    );
 
+
+  /*
+   * ==========================================================
+   * API ERROR
+   * ==========================================================
+   */
 
   script.onerror =
     function() {
@@ -1146,10 +1218,60 @@
       );
 
 
-      delete window[callbackName];
+      cleanup();
 
     };
 
+
+  /*
+   * ==========================================================
+   * TIMEOUT
+   * ==========================================================
+   */
+
+  setTimeout(
+    function() {
+
+      if (completed) {
+
+        return;
+
+      }
+
+
+      console.error(
+        'Dashboard API timeout.'
+      );
+
+
+      if (refreshButton) {
+
+        refreshButton.disabled =
+          false;
+
+        refreshButton.textContent =
+          'Refresh';
+
+      }
+
+
+      alert(
+        'Dashboard is taking too long to load. Please try Refresh.'
+      );
+
+
+      cleanup();
+
+    },
+    15000
+  );
+
+
+  /*
+   * ==========================================================
+   * START REQUEST
+   * ==========================================================
+   */
 
   document.body.appendChild(
     script

@@ -1,357 +1,511 @@
-<style>
-
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100%;
-    background: #f5f6f8;
-    font-family: Arial, sans-serif;
-  }
-
-
-  .stock-receipt-container {
-    width: calc(100% - 40px);
-    max-width: 800px;
-
-    margin: 25px auto;
-
-    background: white;
-
-    padding: 30px;
-
-    border-radius: 10px;
-
-    box-shadow:
-      0 2px 10px rgba(0,0,0,0.10);
-
-    box-sizing: border-box;
-  }
-
-
-  .stock-receipt-container h1 {
-    margin-top: 0;
-    margin-bottom: 25px;
-  }
-
-
-  .stock-receipt-container label {
-    display: block;
-
-    margin-top: 15px;
-
-    font-weight: bold;
-  }
-
-
-  .stock-receipt-container select,
-  .stock-receipt-container input,
-  .stock-receipt-container textarea {
-
-    width: 100%;
-
-    box-sizing: border-box;
-
-    padding: 10px;
-
-    margin-top: 6px;
-
-    border: 1px solid #ccc;
-
-    border-radius: 5px;
-
-    font-size: 14px;
-
-    background: #fff;
-  }
-
-
-  .stock-receipt-container textarea {
-
-    min-height: 80px;
-
-    resize: vertical;
-  }
-
-
-  .stock-receipt-container button {
-
-    margin-top: 25px;
-
-    padding: 12px 20px;
-
-    border: none;
-
-    border-radius: 5px;
-
-    cursor: pointer;
-
-    font-size: 15px;
-
-    font-weight: bold;
-  }
-
-
-  .stock-receipt-container .save-button {
-
-    background: #198754;
-
-    color: white;
-  }
-
-
-  .stock-receipt-container .save-button:hover {
-
-    background: #157347;
-  }
-
-
-  .stock-receipt-container .save-button:disabled {
-
-    background: #aaa;
-
-    cursor: not-allowed;
-  }
-
-
-  .stock-receipt-container .message {
-
-    margin-top: 20px;
-
-    padding: 12px;
-
-    border-radius: 5px;
-
-    display: none;
-  }
-
-
-  .stock-receipt-container .success {
-
-    background: #d1e7dd;
-
-    color: #0f5132;
-  }
-
-
-  .stock-receipt-container .error {
-
-    background: #f8d7da;
-
-    color: #842029;
-  }
-
-
-  .stock-receipt-container .item-info {
-
-    margin-top: 15px;
-
-    padding: 12px;
-
-    background: #f8f9fa;
-
-    border: 1px solid #ddd;
-
-    border-radius: 5px;
-
-    display: none;
-  }
-
-</style>
-
-
-<div class="stock-receipt-container">
-
-  <h1>PPE Stock Receipt</h1>
-
-
-  <label for="itemNo">
-    PPE Item
-  </label>
-
-  <select id="stockReceiptItemNo">
-
-    <option value="">
-      Loading PPE items...
-    </option>
-
-  </select>
-
-
-  <div
-    id="itemInfo"
-    class="item-info"
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
   >
 
-    <div>
-
-      <strong>PPE Item:</strong>
-
-      <span id="ppeItem"></span>
-
-    </div>
+  <title>PPE Stock Receipt</title>
 
 
-    <div style="margin-top:8px;">
+  <style>
 
-      <strong>Unit:</strong>
-
-      <span id="unit"></span>
-
-    </div>
+    * {
+      box-sizing: border-box;
+    }
 
 
-    <div style="margin-top:8px;">
-
-      <strong>Current Available Qty:</strong>
-
-      <span id="currentQty"></span>
-
-    </div>
-
-  </div>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+    }
 
 
-  <label for="receivedQty">
-    Received Qty
-  </label>
-
-  <input
-    type="number"
-    id="stockReceiptReceivedQty"
-    min="1"
-    step="1"
-    placeholder="Enter received quantity"
-  >
+    body {
+      background: #f5f6f8;
+      font-family: Arial, sans-serif;
+      color: #212529;
+    }
 
 
-  <label for="receivedBy">
-    Received By
-  </label>
+    /* =====================================
+       MAIN CONTAINER
+    ===================================== */
 
-  <input
-    type="text"
-    id="stockReceiptReceivedBy"
-    placeholder="Enter name"
-  >
+    .stock-receipt-container {
 
+      width: 800px;
+      max-width: calc(100% - 40px);
 
-  <label for="supplier">
-    Supplier
-  </label>
+      margin: 30px auto;
 
-  <input
-    type="text"
-    id="stockReceiptSupplier"
-    placeholder="Enter supplier"
-  >
+      padding: 30px;
 
+      background: #ffffff;
 
-  <label for="remarks">
-    Remarks
-  </label>
+      border-radius: 10px;
 
-  <textarea
-    id="stockReceiptRemarks"
-    placeholder="Optional remarks"
-  ></textarea>
-
-
-  <button
-    id="stockReceiptSaveButton"
-    class="save-button"
-    type="button"
-    onclick="saveStockReceipt()"
-  >
-    Save Stock Receipt
-  </button>
-
-
-  <div
-    id="stockReceiptMessage"
-    class="message"
-  ></div>
-
-</div>
-
-
-<script>
-
-  const STOCK_RECEIPT_API_URL =
-    'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec';
-
-
-  let inventoryItems = [];
-
-
-  /* ==========================================
-     LOAD PPE INVENTORY
-  ========================================== */
-
-  function loadStockReceiptInventory() {
-
-    const select =
-      document.getElementById(
-        'stockReceiptItemNo'
-      );
-
-    if (!select) {
-
-      return;
+      box-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.10);
 
     }
 
 
-    select.innerHTML =
-      '<option value="">Loading PPE items...</option>';
+    /* =====================================
+       TITLE
+    ===================================== */
+
+    .stock-receipt-container h1 {
+
+      margin: 0 0 25px 0;
+
+      font-size: 28px;
+
+      font-weight: 600;
+
+      color: #212529;
+
+    }
 
 
-    const callbackName =
-      'stockReceiptInventory_' +
-      Date.now();
+    /* =====================================
+       LABELS
+    ===================================== */
+
+    .stock-receipt-container label {
+
+      display: block;
+
+      margin-top: 15px;
+
+      margin-bottom: 0;
+
+      font-size: 14px;
+
+      font-weight: bold;
+
+      color: #212529;
+
+    }
 
 
-    const script =
-      document.createElement(
-        'script'
-      );
+    /* =====================================
+       FORM CONTROLS
+    ===================================== */
+
+    .stock-receipt-container select,
+    .stock-receipt-container input,
+    .stock-receipt-container textarea {
+
+      display: block;
+
+      width: 100%;
+
+      padding: 10px;
+
+      margin-top: 6px;
+
+      border: 1px solid #cccccc;
+
+      border-radius: 5px;
+
+      background: #ffffff;
+
+      color: #212529;
+
+      font-family: Arial, sans-serif;
+
+      font-size: 14px;
+
+      line-height: 1.5;
+
+      outline: none;
+
+    }
 
 
-    let finished =
-      false;
+    .stock-receipt-container select {
+
+      height: 42px;
+
+      cursor: pointer;
+
+    }
 
 
-    function cleanup() {
+    .stock-receipt-container input {
 
-      if (finished) {
+      height: 42px;
+
+    }
+
+
+    .stock-receipt-container textarea {
+
+      min-height: 80px;
+
+      resize: vertical;
+
+    }
+
+
+    .stock-receipt-container select:focus,
+    .stock-receipt-container input:focus,
+    .stock-receipt-container textarea:focus {
+
+      border-color: #86b7fe;
+
+      outline: 0;
+
+      box-shadow:
+        0 0 0 0.15rem rgba(13, 110, 253, 0.15);
+
+    }
+
+
+    /* =====================================
+       ITEM INFORMATION
+    ===================================== */
+
+    .stock-receipt-container .item-info {
+
+      margin-top: 15px;
+
+      padding: 12px;
+
+      background: #f8f9fa;
+
+      border: 1px solid #dddddd;
+
+      border-radius: 5px;
+
+      display: none;
+
+    }
+
+
+    .stock-receipt-container .item-info div {
+
+      font-size: 14px;
+
+      line-height: 1.5;
+
+    }
+
+
+    .stock-receipt-container .item-info strong {
+
+      font-weight: bold;
+
+    }
+
+
+    /* =====================================
+       SAVE BUTTON
+    ===================================== */
+
+    .stock-receipt-container button {
+
+      margin-top: 25px;
+
+      padding: 12px 20px;
+
+      border: none;
+
+      border-radius: 5px;
+
+      cursor: pointer;
+
+      font-family: Arial, sans-serif;
+
+      font-size: 15px;
+
+      font-weight: bold;
+
+    }
+
+
+    .stock-receipt-container .save-button {
+
+      background: #198754;
+
+      color: white;
+
+    }
+
+
+    .stock-receipt-container .save-button:hover {
+
+      background: #157347;
+
+    }
+
+
+    .stock-receipt-container .save-button:disabled {
+
+      background: #aaaaaa;
+
+      cursor: not-allowed;
+
+    }
+
+
+    /* =====================================
+       MESSAGE
+    ===================================== */
+
+    .stock-receipt-container .message {
+
+      margin-top: 20px;
+
+      padding: 12px;
+
+      border-radius: 5px;
+
+      display: none;
+
+      font-size: 14px;
+
+    }
+
+
+    .stock-receipt-container .success {
+
+      background: #d1e7dd;
+
+      color: #0f5132;
+
+    }
+
+
+    .stock-receipt-container .error {
+
+      background: #f8d7da;
+
+      color: #842029;
+
+    }
+
+
+    /* =====================================
+       MOBILE
+    ===================================== */
+
+    @media (max-width: 850px) {
+
+      .stock-receipt-container {
+
+        width: auto;
+
+        max-width: calc(100% - 30px);
+
+        margin: 20px auto;
+
+        padding: 25px;
+
+      }
+
+    }
+
+
+    @media (max-width: 500px) {
+
+      .stock-receipt-container {
+
+        max-width: calc(100% - 20px);
+
+        margin: 10px auto;
+
+        padding: 20px;
+
+      }
+
+      .stock-receipt-container h1 {
+
+        font-size: 24px;
+
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <div class="stock-receipt-container">
+
+    <h1>PPE Stock Receipt</h1>
+
+
+    <label for="stockReceiptItemNo">
+      PPE Item
+    </label>
+
+    <select id="stockReceiptItemNo">
+
+      <option value="">
+        Loading PPE items...
+      </option>
+
+    </select>
+
+
+    <div
+      id="itemInfo"
+      class="item-info"
+    >
+
+      <div>
+
+        <strong>PPE Item:</strong>
+
+        <span id="ppeItem"></span>
+
+      </div>
+
+
+      <div style="margin-top:8px;">
+
+        <strong>Unit:</strong>
+
+        <span id="unit"></span>
+
+      </div>
+
+
+      <div style="margin-top:8px;">
+
+        <strong>Current Available Qty:</strong>
+
+        <span id="currentQty"></span>
+
+      </div>
+
+    </div>
+
+
+    <label for="stockReceiptReceivedQty">
+      Received Qty
+    </label>
+
+    <input
+      type="number"
+      id="stockReceiptReceivedQty"
+      min="1"
+      step="1"
+      placeholder="Enter received quantity"
+    >
+
+
+    <label for="stockReceiptReceivedBy">
+      Received By
+    </label>
+
+    <input
+      type="text"
+      id="stockReceiptReceivedBy"
+      placeholder="Enter name"
+    >
+
+
+    <label for="stockReceiptSupplier">
+      Supplier
+    </label>
+
+    <input
+      type="text"
+      id="stockReceiptSupplier"
+      placeholder="Enter supplier"
+    >
+
+
+    <label for="stockReceiptRemarks">
+      Remarks
+    </label>
+
+    <textarea
+      id="stockReceiptRemarks"
+      placeholder="Optional remarks"
+    ></textarea>
+
+
+    <button
+      id="stockReceiptSaveButton"
+      class="save-button"
+      type="button"
+      onclick="saveStockReceipt()"
+    >
+      Save Stock Receipt
+    </button>
+
+
+    <div
+      id="stockReceiptMessage"
+      class="message"
+    ></div>
+
+  </div>
+
+
+  <script>
+
+    const STOCK_RECEIPT_API_URL =
+      'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec';
+
+
+    let inventoryItems = [];
+
+
+    /* =====================================
+       LOAD PPE ITEMS
+    ===================================== */
+
+    function loadStockReceiptInventory() {
+
+      const select =
+        document.getElementById(
+          'stockReceiptItemNo'
+        );
+
+
+      if (!select) {
 
         return;
 
       }
 
-      finished =
-        true;
+
+      select.innerHTML =
+        '<option value="">Loading PPE items...</option>';
 
 
-      delete window[callbackName];
+      const callbackName =
+        'stockReceiptInventory_' +
+        Date.now();
 
 
-      if (
-        script.parentNode
-      ) {
-
-        script.parentNode.removeChild(
-          script
+      const script =
+        document.createElement(
+          'script'
         );
 
-      }
 
-    }
+      let finished =
+        false;
 
 
-    window[callbackName] =
-      function(data) {
+      function cleanup() {
 
         if (finished) {
 
@@ -360,176 +514,207 @@
         }
 
 
-        try {
+        finished = true;
 
-          if (
-            !Array.isArray(data)
-          ) {
 
-            throw new Error(
-              'Invalid PPE inventory response.'
+        delete window[callbackName];
+
+
+        if (
+          script.parentNode
+        ) {
+
+          script.parentNode.removeChild(
+            script
+          );
+
+        }
+
+      }
+
+
+      window[callbackName] =
+        function(data) {
+
+          if (finished) {
+
+            return;
+
+          }
+
+
+          try {
+
+            if (
+              !Array.isArray(data)
+            ) {
+
+              throw new Error(
+                'Invalid PPE inventory response.'
+              );
+
+            }
+
+
+            inventoryItems =
+              data;
+
+
+            select.innerHTML =
+              '<option value="">Select PPE Item</option>';
+
+
+            inventoryItems.forEach(
+              function(item) {
+
+                const itemNo =
+                  String(
+                    item.itemNo || ''
+                  ).trim();
+
+
+                if (!itemNo) {
+
+                  return;
+
+                }
+
+
+                const option =
+                  document.createElement(
+                    'option'
+                  );
+
+
+                option.value =
+                  itemNo;
+
+
+                option.textContent =
+                  item.itemNo +
+                  ' - ' +
+                  item.ppeItem +
+                  ' (' +
+                  item.unit +
+                  ')';
+
+
+                select.appendChild(
+                  option
+                );
+
+              }
+            );
+
+
+            if (
+              select.options.length === 1
+            ) {
+
+              select.innerHTML =
+                '<option value="">No active PPE items found</option>';
+
+            }
+
+          } catch (error) {
+
+            select.innerHTML =
+              '<option value="">Unable to load PPE items</option>';
+
+
+            showStockReceiptMessage(
+              error.message ||
+              'Unable to load PPE inventory.',
+              false
             );
 
           }
 
 
-          inventoryItems =
-            data;
+          cleanup();
+
+        };
 
 
-          select.innerHTML =
-            '<option value="">Select PPE Item</option>';
+      script.src =
+        STOCK_RECEIPT_API_URL +
+        '?api=getActivePPEInventory' +
+        '&callback=' +
+        encodeURIComponent(
+          callbackName
+        );
 
 
-          inventoryItems.forEach(
-            function(item) {
-
-              const itemNo =
-                String(
-                  item.itemNo || ''
-                ).trim();
-
-
-              if (!itemNo) {
-
-                return;
-
-              }
-
-
-              const option =
-                document.createElement(
-                  'option'
-                );
-
-
-              option.value =
-                itemNo;
-
-
-              option.textContent =
-                item.itemNo +
-                ' - ' +
-                item.ppeItem +
-                ' (' +
-                item.unit +
-                ')';
-
-
-              select.appendChild(
-                option
-              );
-
-            }
-          );
-
-
-          if (
-            select.options.length === 1
-          ) {
-
-            select.innerHTML =
-              '<option value="">No active PPE items found</option>';
-
-          }
-
-        } catch (error) {
+      script.onerror =
+        function() {
 
           select.innerHTML =
             '<option value="">Unable to load PPE items</option>';
 
 
           showStockReceiptMessage(
-            error.message ||
-            'Unable to load PPE inventory.',
+            'Unable to connect to PPE Inventory API.',
             false
           );
 
-        }
+
+          cleanup();
+
+        };
 
 
-        cleanup();
+      setTimeout(
+        function() {
 
-      };
+          if (finished) {
+
+            return;
+
+          }
 
 
-    script.src =
-      STOCK_RECEIPT_API_URL +
-      '?api=getActivePPEInventory' +
-      '&callback=' +
-      encodeURIComponent(
-        callbackName
+          select.innerHTML =
+            '<option value="">Unable to load PPE items</option>';
+
+
+          showStockReceiptMessage(
+            'PPE inventory is taking too long to load.',
+            false
+          );
+
+
+          cleanup();
+
+        },
+        15000
       );
 
 
-    script.onerror =
-      function() {
-
-        select.innerHTML =
-          '<option value="">Unable to load PPE items</option>';
-
-
-        showStockReceiptMessage(
-          'Unable to connect to PPE Inventory API.',
-          false
-        );
-
-
-        cleanup();
-
-      };
-
-
-    setTimeout(
-      function() {
-
-        if (finished) {
-
-          return;
-
-        }
-
-
-        select.innerHTML =
-          '<option value="">Unable to load PPE items</option>';
-
-
-        showStockReceiptMessage(
-          'PPE inventory is taking too long to load.',
-          false
-        );
-
-
-        cleanup();
-
-      },
-      15000
-    );
-
-
-    document.head.appendChild(
-      script
-    );
-
-  }
-
-
-  /* ==========================================
-     INITIALIZE
-  ========================================== */
-
-  function initializeStockReceipt() {
-
-    loadStockReceiptInventory();
-
-
-    const select =
-      document.getElementById(
-        'stockReceiptItemNo'
+      document.head.appendChild(
+        script
       );
 
+    }
 
-    if (select) {
+
+    /* =====================================
+       PPE ITEM CHANGE
+    ===================================== */
+
+    function initializeStockReceipt() {
+
+      const select =
+        document.getElementById(
+          'stockReceiptItemNo'
+        );
+
+
+      if (!select) {
+
+        return;
+
+      }
+
 
       select.onchange =
         function() {
@@ -592,324 +777,322 @@
 
         };
 
+
+      loadStockReceiptInventory();
+
     }
 
-  }
 
+    /* =====================================
+       SAVE
+    ===================================== */
 
-  /* ==========================================
-     SAVE STOCK RECEIPT
-  ========================================== */
+    function saveStockReceipt() {
 
-  function saveStockReceipt() {
-
-    const saveButton =
-      document.getElementById(
-        'stockReceiptSaveButton'
-      );
-
-
-    const itemNo =
-      document.getElementById(
-        'stockReceiptItemNo'
-      ).value;
-
-
-    const receivedQty =
-      Number(
+      const saveButton =
         document.getElementById(
-          'stockReceiptReceivedQty'
-        ).value
-      );
-
-
-    const receivedBy =
-      document.getElementById(
-        'stockReceiptReceivedBy'
-      ).value.trim();
-
-
-    const supplier =
-      document.getElementById(
-        'stockReceiptSupplier'
-      ).value.trim();
-
-
-    const remarks =
-      document.getElementById(
-        'stockReceiptRemarks'
-      ).value.trim();
-
-
-    if (!itemNo) {
-
-      showStockReceiptMessage(
-        'Please select a PPE item.',
-        false
-      );
-
-      return;
-
-    }
-
-
-    if (
-      !receivedQty ||
-      receivedQty <= 0
-    ) {
-
-      showStockReceiptMessage(
-        'Received Qty must be greater than zero.',
-        false
-      );
-
-      return;
-
-    }
-
-
-    if (!receivedBy) {
-
-      showStockReceiptMessage(
-        'Received By is required.',
-        false
-      );
-
-      return;
-
-    }
-
-
-    saveButton.disabled =
-      true;
-
-
-    saveButton.textContent =
-      'Saving...';
-
-
-    fetch(
-      STOCK_RECEIPT_API_URL,
-      {
-
-        method:
-          'POST',
-
-        headers: {
-
-          'Content-Type':
-            'text/plain;charset=utf-8'
-
-        },
-
-        body:
-          JSON.stringify({
-
-            action:
-              'addPPEStockReceipt',
-
-            data: {
-
-              itemNo:
-                itemNo,
-
-              receivedQty:
-                receivedQty,
-
-              receivedBy:
-                receivedBy,
-
-              supplier:
-                supplier,
-
-              remarks:
-                remarks
-
-            }
-
-          })
-
-      }
-    )
-
-    .then(
-      function(response) {
-
-        if (!response.ok) {
-
-          throw new Error(
-            'HTTP error: ' +
-            response.status
-          );
-
-        }
-
-
-        return response.json();
-
-      }
-    )
-
-    .then(
-      function(result) {
-
-        if (
-          !result ||
-          result.success === false
-        ) {
-
-          throw new Error(
-            result &&
-            result.error
-              ? result.error
-              : 'Unable to save stock receipt.'
-          );
-
-        }
-
-
-        showStockReceiptMessage(
-
-          'Stock receipt saved successfully. ' +
-          'Receipt ID: ' +
-          (
-            result.receiptId || ''
-          ) +
-          ' | New Available Qty: ' +
-          (
-            result.newAvailableQty || 0
-          ) +
-          ' ' +
-          (
-            result.unit || ''
-          ),
-
-          true
-
+          'stockReceiptSaveButton'
         );
 
 
+      const itemNo =
         document.getElementById(
-          'stockReceiptReceivedQty'
-        ).value =
-          '';
+          'stockReceiptItemNo'
+        ).value;
 
 
+      const receivedQty =
+        Number(
+          document.getElementById(
+            'stockReceiptReceivedQty'
+          ).value
+        );
+
+
+      const receivedBy =
+        document.getElementById(
+          'stockReceiptReceivedBy'
+        ).value.trim();
+
+
+      const supplier =
         document.getElementById(
           'stockReceiptSupplier'
-        ).value =
-          '';
+        ).value.trim();
 
 
+      const remarks =
         document.getElementById(
           'stockReceiptRemarks'
-        ).value =
-          '';
+        ).value.trim();
 
 
-        saveButton.disabled =
-          false;
-
-
-        saveButton.textContent =
-          'Save Stock Receipt';
-
-
-        loadStockReceiptInventory();
-
-      }
-    )
-
-    .catch(
-      function(error) {
+      if (!itemNo) {
 
         showStockReceiptMessage(
-
-          error &&
-          error.message
-            ? error.message
-            : 'Unable to save stock receipt.',
-
+          'Please select a PPE item.',
           false
-
         );
 
-
-        saveButton.disabled =
-          false;
-
-
-        saveButton.textContent =
-          'Save Stock Receipt';
+        return;
 
       }
-    );
-
-  }
 
 
-  /* ==========================================
-     MESSAGE
-  ========================================== */
+      if (
+        !receivedQty ||
+        receivedQty <= 0
+      ) {
 
-  function showStockReceiptMessage(
-    message,
-    success
-  ) {
+        showStockReceiptMessage(
+          'Received Qty must be greater than zero.',
+          false
+        );
 
-    const element =
-      document.getElementById(
-        'stockReceiptMessage'
+        return;
+
+      }
+
+
+      if (!receivedBy) {
+
+        showStockReceiptMessage(
+          'Received By is required.',
+          false
+        );
+
+        return;
+
+      }
+
+
+      saveButton.disabled =
+        true;
+
+
+      saveButton.textContent =
+        'Saving...';
+
+
+      fetch(
+        STOCK_RECEIPT_API_URL,
+        {
+
+          method:
+            'POST',
+
+          headers: {
+
+            'Content-Type':
+              'text/plain;charset=utf-8'
+
+          },
+
+          body:
+            JSON.stringify({
+
+              action:
+                'addPPEStockReceipt',
+
+              data: {
+
+                itemNo:
+                  itemNo,
+
+                receivedQty:
+                  receivedQty,
+
+                receivedBy:
+                  receivedBy,
+
+                supplier:
+                  supplier,
+
+                remarks:
+                  remarks
+
+              }
+
+            })
+
+        }
+      )
+
+      .then(
+        function(response) {
+
+          if (!response.ok) {
+
+            throw new Error(
+              'HTTP error: ' +
+              response.status
+            );
+
+          }
+
+
+          return response.json();
+
+        }
+      )
+
+      .then(
+        function(result) {
+
+          if (
+            !result ||
+            result.success === false
+          ) {
+
+            throw new Error(
+              result &&
+              result.error
+                ? result.error
+                : 'Unable to save stock receipt.'
+            );
+
+          }
+
+
+          showStockReceiptMessage(
+
+            'Stock receipt saved successfully. ' +
+            'Receipt ID: ' +
+            (
+              result.receiptId || ''
+            ) +
+            ' | New Available Qty: ' +
+            (
+              result.newAvailableQty || 0
+            ) +
+            ' ' +
+            (
+              result.unit || ''
+            ),
+
+            true
+
+          );
+
+
+          document.getElementById(
+            'stockReceiptReceivedQty'
+          ).value = '';
+
+
+          document.getElementById(
+            'stockReceiptSupplier'
+          ).value = '';
+
+
+          document.getElementById(
+            'stockReceiptRemarks'
+          ).value = '';
+
+
+          saveButton.disabled =
+            false;
+
+
+          saveButton.textContent =
+            'Save Stock Receipt';
+
+
+          loadStockReceiptInventory();
+
+        }
+      )
+
+      .catch(
+        function(error) {
+
+          showStockReceiptMessage(
+
+            error &&
+            error.message
+              ? error.message
+              : 'Unable to save stock receipt.',
+
+            false
+
+          );
+
+
+          saveButton.disabled =
+            false;
+
+
+          saveButton.textContent =
+            'Save Stock Receipt';
+
+        }
       );
-
-
-    if (!element) {
-
-      return;
 
     }
 
 
-    element.textContent =
-      message;
+    /* =====================================
+       MESSAGE
+    ===================================== */
+
+    function showStockReceiptMessage(
+      message,
+      success
+    ) {
+
+      const element =
+        document.getElementById(
+          'stockReceiptMessage'
+        );
 
 
-    element.className =
-      'message ' +
-      (
-        success
-          ? 'success'
-          : 'error'
+      if (!element) {
+
+        return;
+
+      }
+
+
+      element.textContent =
+        message;
+
+
+      element.className =
+        'message ' +
+        (
+          success
+            ? 'success'
+            : 'error'
+        );
+
+
+      element.style.display =
+        'block';
+
+    }
+
+
+    /* =====================================
+       START
+    ===================================== */
+
+    if (
+      document.readyState ===
+      'loading'
+    ) {
+
+      document.addEventListener(
+        'DOMContentLoaded',
+        initializeStockReceipt
       );
 
+    } else {
 
-    element.style.display =
-      'block';
+      initializeStockReceipt();
 
-  }
+    }
 
+  </script>
 
-  /* ==========================================
-     START
-  ========================================== */
-
-  if (
-    document.readyState ===
-    'loading'
-  ) {
-
-    document.addEventListener(
-      'DOMContentLoaded',
-      initializeStockReceipt
-    );
-
-  } else {
-
-    initializeStockReceipt();
-
-  }
-
-</script>
-
-
-
+</body>
+</html>

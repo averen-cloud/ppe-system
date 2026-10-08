@@ -138,32 +138,118 @@ let itemCount = 0;
 
 function loadFormData() {
 
-  google.script.run
+  const callbackName =
+    'ppeRequestFormData_' +
+    Date.now();
 
-    .withSuccessHandler(function(data) {
+  const script =
+    document.createElement('script');
 
-      formData = data;
+  let finished = false;
 
-      loadRequestors();
+  function cleanup() {
 
-      loadEmployees();
+    if (finished) return;
 
-      loadProjects();
+    finished = true;
 
-      loadInventory();
+    delete window[callbackName];
 
-    })
+    if (script.parentNode) {
+      script.parentNode.removeChild(script);
+    }
 
-    .withFailureHandler(function(error) {
+  }
+
+  window[callbackName] =
+    function(data) {
+
+      if (finished) return;
+
+      try {
+
+        if (
+          !data ||
+          typeof data !== 'object'
+        ) {
+
+          throw new Error(
+            'Invalid Google Sheets data response.'
+          );
+
+        }
+
+        formData = data;
+
+        loadRequestors();
+
+        loadEmployees();
+
+        loadProjects();
+
+        loadInventory();
+
+      } catch (error) {
+
+        alert(
+          'Unable to load Google Sheets data:\n' +
+          (
+            error &&
+            error.message
+              ? error.message
+              : String(error)
+          )
+        );
+
+      } finally {
+
+        cleanup();
+
+      }
+
+    };
+
+
+  script.src =
+    'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec' +
+    '?api=getFormData' +
+    '&callback=' +
+    encodeURIComponent(
+      callbackName
+    );
+
+
+  script.onerror =
+    function() {
 
       alert(
-        'Unable to load Google Sheets data:\n' +
-        error.message
+        'Unable to connect to PPE Request API.'
       );
 
-    })
+      cleanup();
 
-    .getFormData();
+    };
+
+
+  setTimeout(
+    function() {
+
+      if (finished) return;
+
+      alert(
+        'Google Sheets data is taking too long to load.'
+      );
+
+      cleanup();
+
+    },
+    15000
+  );
+
+
+  document.head.appendChild(
+    script
+  );
 
 }
 

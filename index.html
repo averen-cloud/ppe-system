@@ -358,16 +358,38 @@ requestorInput.addEventListener(
           function() {
 
             requestorInput.value =
-              requestor['Requestor Name'];
+  requestor['Requestor Name'];
 
+requestorSuggestions.style.display =
+  'none';
 
-            requestorSuggestions.style.display =
-              'none';
+const department =
+  String(
+    requestor['Department'] || ''
+  ).trim();
 
+if (!department) {
 
-            loadDepartmentApprovers(
-              requestor['Department']
-            );
+  document.getElementById(
+    'approverName'
+  ).textContent =
+    'No department assigned';
+
+  document.getElementById(
+    'approverEmail'
+  ).textContent = '';
+
+  alert(
+    'No department is assigned to this Requestor.'
+  );
+
+} else {
+
+  loadDepartmentApprovers(
+    department
+  );
+
+}
 
           }
         );

@@ -1174,51 +1174,142 @@ const projectCode =
     'Submitting...';
 
 
-  google.script.run
+    const callbackName =
+    'ppeSubmit_' +
+    Date.now();
 
-    .withSuccessHandler(
-      function(result) {
+  const script =
+    document.createElement('script');
+
+  let finished = false;
+
+  function cleanup() {
+
+    if (finished) return;
+
+    finished = true;
+
+    delete window[callbackName];
+
+    if (script.parentNode) {
+
+      script.parentNode.removeChild(
+        script
+      );
+
+    }
+
+  }
+
+
+  window[callbackName] =
+    function(result) {
+
+      try {
+
+        if (
+          !result ||
+          result.success === false
+        ) {
+
+          throw new Error(
+            result &&
+            result.error
+              ? result.error
+              : 'Unable to submit PPE request.'
+          );
+
+        }
+
 
         alert(
           'PPE Request submitted successfully!\n\n' +
           'Request ID: ' +
-          result.requestId
+          (
+            result.requestId ||
+            ''
+          )
         );
 
 
         resetForm();
 
 
-        button.disabled = false;
-
-        button.textContent =
-          'Submit PPE Request';
-
-      }
-    )
-
-    .withFailureHandler(
-      function(error) {
+      } catch (error) {
 
         alert(
           'Submission failed:\n\n' +
-          error.message
+          (
+            error.message ||
+            String(error)
+          )
         );
 
+      } finally {
 
         button.disabled = false;
 
         button.textContent =
           'Submit PPE Request';
 
-      }
-    )
+        cleanup();
 
-    .submitPPERequest(
-      request
+      }
+
+    };
+
+
+  script.src =
+    'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec' +
+    '?api=submitPPERequest' +
+    '&data=' +
+    encodeURIComponent(
+      JSON.stringify(request)
+    ) +
+    '&callback=' +
+    encodeURIComponent(
+      callbackName
     );
 
-}
+
+  script.onerror =
+    function() {
+
+      alert(
+        'Unable to connect to PPE Request API.'
+      );
+
+      button.disabled = false;
+
+      button.textContent =
+        'Submit PPE Request';
+
+      cleanup();
+
+    };
+
+
+  setTimeout(function() {
+
+    if (finished) return;
+
+    alert(
+      'PPE Request submission is taking too long.'
+    );
+
+    button.disabled = false;
+
+    button.textContent =
+      'Submit PPE Request';
+
+    cleanup();
+
+  }, 15000);
+
+
+  document.head.appendChild(
+    script
+  );
 
 
 /* ================================

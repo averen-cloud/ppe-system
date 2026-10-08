@@ -789,19 +789,25 @@ function loadDepartmentApprovers(department) {
       try {
 
         if (
-          !Array.isArray(approvers) ||
-          approvers.length === 0
-        ) {
+  !Array.isArray(approvers) ||
+  approvers.length === 0
+) {
 
-          approverName.textContent =
-            'No approver configured';
+  approverName.textContent =
+    'No approver configured';
 
-          approverEmail.textContent =
-            '';
+  approverEmail.textContent =
+    '';
 
-          return;
+  alert(
+    'No approver assigned for the Requestor Department:\n\n' +
+    department +
+    '\n\nPlease contact the administrator to configure an active Department Manager.'
+  );
 
-        }
+  return;
+
+}
 
         const first =
           approvers[0];

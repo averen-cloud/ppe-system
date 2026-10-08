@@ -738,74 +738,124 @@ document.addEventListener(
    APPROVERS
 ================================ */
 
-function loadDepartmentApprovers(
-  department
-) {
+function loadDepartmentApprovers(department) {
 
-  google.script.run
+  const approverName =
+    document.getElementById('approverName');
 
-    .withSuccessHandler(
-      function(approvers) {
+  const approverEmail =
+    document.getElementById('approverEmail');
+
+  if (!department) {
+
+    approverName.textContent =
+      'Will be auto-populated based on Requestor Department';
+
+    approverEmail.textContent = '';
+
+    return;
+  }
+
+  approverName.textContent =
+    'Loading approver...';
+
+  approverEmail.textContent = '';
+
+  const callbackName =
+    'ppeApprover_' + Date.now();
+
+  const script =
+    document.createElement('script');
+
+  let finished = false;
+
+  function cleanup() {
+
+    if (finished) return;
+
+    finished = true;
+
+    delete window[callbackName];
+
+    if (script.parentNode) {
+      script.parentNode.removeChild(script);
+    }
+
+  }
+
+  window[callbackName] =
+    function(approvers) {
+
+      try {
 
         if (
-          !approvers ||
+          !Array.isArray(approvers) ||
           approvers.length === 0
         ) {
 
-          document
-            .getElementById(
-              'approverName'
-            )
-            .textContent =
+          approverName.textContent =
             'No approver configured';
 
-          document
-            .getElementById(
-              'approverEmail'
-            )
-            .textContent = '';
+          approverEmail.textContent =
+            '';
 
           return;
 
         }
 
-
         const first =
           approvers[0];
 
+        approverName.textContent =
+          first['Approver Name'] ||
+          'No approver configured';
 
-        document
-          .getElementById(
-            'approverName'
-          )
-          .textContent =
-          first['Approver Name'];
-
-
-        document
-          .getElementById(
-            'approverEmail'
-          )
-          .textContent =
-          first['Approver Email'];
+        approverEmail.textContent =
+          first['Approver Email'] ||
+          '';
 
       }
-    )
 
-    .withFailureHandler(
-      function(error) {
+      catch (error) {
 
-        alert(
-          'Unable to load approvers:\n' +
-          error.message
-        );
+        approverName.textContent =
+          'Unable to load approver';
+
+        approverEmail.textContent =
+          '';
 
       }
-    )
 
-    .getApproversByDepartment(
-      department
-    );
+      finally {
+
+        cleanup();
+
+      }
+
+    };
+
+  script.src =
+    'https://script.google.com/macros/s/AKfycbz8RqXxolNOi2iPj7IoIybWSuonq9Fwkb0u9aXRjdyp0HQqvb3FHYjrj8U7DbjS1hY7/exec' +
+    '?api=getApproversByDepartment' +
+    '&department=' +
+    encodeURIComponent(department) +
+    '&callback=' +
+    encodeURIComponent(callbackName);
+
+  script.onerror =
+    function() {
+
+      approverName.textContent =
+        'Unable to load approver';
+
+      approverEmail.textContent =
+        '';
+
+      cleanup();
+
+    };
+
+  document.head.appendChild(script);
 
 }
 

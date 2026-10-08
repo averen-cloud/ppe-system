@@ -783,252 +783,325 @@
     }
 
 
-    /* =====================================
-       SAVE
-    ===================================== */
+// =====================================
+// SAVE
+// =====================================
 
-    function saveStockReceipt() {
+function saveStockReceipt() {
 
-      const saveButton =
-        document.getElementById(
-          'stockReceiptSaveButton'
-        );
+  const saveButton =
+    document.getElementById(
+      'stockReceiptSaveButton'
+    );
 
 
-      const itemNo =
-        document.getElementById(
-          'stockReceiptItemNo'
-        ).value;
+  const itemNo =
+    document.getElementById(
+      'stockReceiptItemNo'
+    ).value;
 
 
-      const receivedQty =
-        Number(
-          document.getElementById(
-            'stockReceiptReceivedQty'
-          ).value
-        );
+  const receivedQty =
+    Number(
+      document.getElementById(
+        'stockReceiptReceivedQty'
+      ).value
+    );
 
 
-      const receivedBy =
-        document.getElementById(
-          'stockReceiptReceivedBy'
-        ).value.trim();
+  const receivedBy =
+    document.getElementById(
+      'stockReceiptReceivedBy'
+    ).value.trim();
 
 
-      const supplier =
-        document.getElementById(
-          'stockReceiptSupplier'
-        ).value.trim();
+  const supplier =
+    document.getElementById(
+      'stockReceiptSupplier'
+    ).value.trim();
 
 
-      const remarks =
-        document.getElementById(
-          'stockReceiptRemarks'
-        ).value.trim();
+  const remarks =
+    document.getElementById(
+      'stockReceiptRemarks'
+    ).value.trim();
 
 
-      if (!itemNo) {
+  if (!itemNo) {
 
-        showStockReceiptMessage(
-          'Please select a PPE item.',
-          false
-        );
+    showStockReceiptMessage(
+      'Please select a PPE item.',
+      false
+    );
 
-        return;
+    return;
 
-      }
+  }
 
 
-      if (
-        !receivedQty ||
-        receivedQty <= 0
-      ) {
+  if (
+    !receivedQty ||
+    receivedQty <= 0
+  ) {
 
-        showStockReceiptMessage(
-          'Received Qty must be greater than zero.',
-          false
-        );
+    showStockReceiptMessage(
+      'Received Qty must be greater than zero.',
+      false
+    );
 
-        return;
+    return;
 
-      }
+  }
 
 
-      if (!receivedBy) {
+  if (!receivedBy) {
 
-        showStockReceiptMessage(
-          'Received By is required.',
-          false
-        );
+    showStockReceiptMessage(
+      'Received By is required.',
+      false
+    );
 
-        return;
+    return;
 
-      }
+  }
 
 
-      saveButton.disabled =
-        true;
+  saveButton.disabled =
+    true;
 
 
-      saveButton.textContent =
-        'Saving...';
+  saveButton.textContent =
+    'Saving...';
 
 
-      fetch(
-        STOCK_RECEIPT_API_URL,
-        {
+  // =====================================
+  // PREPARE DATA
+  // =====================================
 
-          method:
-            'POST',
+  const receiptData = {
 
-          headers: {
+    itemNo:
+      itemNo,
 
-            'Content-Type':
-              'text/plain;charset=utf-8'
+    receivedQty:
+      receivedQty,
 
-          },
+    receivedBy:
+      receivedBy,
 
-          body:
-            JSON.stringify({
+    supplier:
+      supplier,
 
-              action:
-                'addPPEStockReceipt',
+    remarks:
+      remarks
 
-              data: {
+  };
 
-                itemNo:
-                  itemNo,
 
-                receivedQty:
-                  receivedQty,
+  // =====================================
+  // JSONP SAVE
+  // =====================================
 
-                receivedBy:
-                  receivedBy,
+  const callbackName =
+    'stockReceiptSave_' +
+    Date.now();
 
-                supplier:
-                  supplier,
 
-                remarks:
-                  remarks
+  const script =
+    document.createElement(
+      'script'
+    );
 
-              }
 
-            })
+  let finished =
+    false;
 
-        }
-      )
 
-      .then(
-        function(response) {
+  function cleanup() {
 
-          if (!response.ok) {
+    if (finished) {
 
-            throw new Error(
-              'HTTP error: ' +
-              response.status
-            );
+      return;
 
-          }
+    }
 
 
-          return response.json();
+    finished = true;
 
-        }
-      )
 
-      .then(
-        function(result) {
+    delete window[callbackName];
 
-          if (
-            !result ||
-            result.success === false
-          ) {
 
-            throw new Error(
-              result &&
-              result.error
-                ? result.error
-                : 'Unable to save stock receipt.'
-            );
+    if (
+      script.parentNode
+    ) {
 
-          }
-
-
-          showStockReceiptMessage(
-
-            'Stock receipt saved successfully. ' +
-            'Receipt ID: ' +
-            (
-              result.receiptId || ''
-            ) +
-            ' | New Available Qty: ' +
-            (
-              result.newAvailableQty || 0
-            ) +
-            ' ' +
-            (
-              result.unit || ''
-            ),
-
-            true
-
-          );
-
-
-          document.getElementById(
-            'stockReceiptReceivedQty'
-          ).value = '';
-
-
-          document.getElementById(
-            'stockReceiptSupplier'
-          ).value = '';
-
-
-          document.getElementById(
-            'stockReceiptRemarks'
-          ).value = '';
-
-
-          saveButton.disabled =
-            false;
-
-
-          saveButton.textContent =
-            'Save Stock Receipt';
-
-
-          loadStockReceiptInventory();
-
-        }
-      )
-
-      .catch(
-        function(error) {
-
-          showStockReceiptMessage(
-
-            error &&
-            error.message
-              ? error.message
-              : 'Unable to save stock receipt.',
-
-            false
-
-          );
-
-
-          saveButton.disabled =
-            false;
-
-
-          saveButton.textContent =
-            'Save Stock Receipt';
-
-        }
+      script.parentNode.removeChild(
+        script
       );
 
     }
+
+  }
+
+
+  window[callbackName] =
+    function(result) {
+
+      try {
+
+        if (
+          !result ||
+          result.success === false
+        ) {
+
+          throw new Error(
+
+            result &&
+            result.error
+              ? result.error
+              : 'Unable to save stock receipt.'
+
+          );
+
+        }
+
+
+        // =================================
+        // SUCCESS
+        // =================================
+
+        showStockReceiptMessage(
+
+          'Stock receipt saved successfully. ' +
+          'Receipt ID: ' +
+          (
+            result.receiptId || ''
+          ) +
+          ' | New Available Qty: ' +
+          (
+            result.newAvailableQty || 0
+          ) +
+          ' ' +
+          (
+            result.unit || ''
+          ),
+
+          true
+
+        );
+
+
+        // Clear form
+
+        document.getElementById(
+          'stockReceiptReceivedQty'
+        ).value = '';
+
+
+        document.getElementById(
+          'stockReceiptSupplier'
+        ).value = '';
+
+
+        document.getElementById(
+          'stockReceiptRemarks'
+        ).value = '';
+
+
+        // Reload inventory
+
+        loadStockReceiptInventory();
+
+
+      }
+
+      catch (error) {
+
+        showStockReceiptMessage(
+
+          error &&
+          error.message
+            ? error.message
+            : 'Unable to save stock receipt.',
+
+          false
+
+        );
+
+      }
+
+
+      finally {
+
+        saveButton.disabled =
+          false;
+
+
+        saveButton.textContent =
+          'Save Stock Receipt';
+
+
+        cleanup();
+
+      }
+
+    };
+
+
+  // =====================================
+  // SCRIPT REQUEST
+  // =====================================
+
+  script.id =
+    callbackName;
+
+
+  script.src =
+    STOCK_RECEIPT_API_URL +
+    '?api=addPPEStockReceipt' +
+    '&data=' +
+    encodeURIComponent(
+      JSON.stringify(
+        receiptData
+      )
+    ) +
+    '&callback=' +
+    encodeURIComponent(
+      callbackName
+    );
+
+
+  script.onerror =
+    function() {
+
+      showStockReceiptMessage(
+
+        'Unable to connect to PPE Stock Receipt API.',
+
+        false
+
+      );
+
+
+      saveButton.disabled =
+        false;
+
+
+      saveButton.textContent =
+        'Save Stock Receipt';
+
+
+      cleanup();
+
+    };
+
+
+  document.head.appendChild(
+    script
+  );
+
+}
 
 
     /* =====================================

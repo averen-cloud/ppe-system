@@ -146,6 +146,13 @@
       color: #222;
     }
 
+    .remarks-value {
+      font-weight: normal;
+      color: #333;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
     .status {
       display: inline-block;
       padding: 5px 10px;
@@ -418,7 +425,7 @@
 
         <div class="info-label">
           Current Status
-        </div>
+        </div>  
 
         <div>
 
@@ -430,6 +437,21 @@
         </div>
 
       </div>
+
+      <!-- APPROVER REMARKS -->
+
+      <div class="info-item" style="grid-column: 1 / -1;">
+
+        <div class="info-label">
+          Approver Remarks / Comments
+        </div>
+
+        <div
+          id="displayApproverRemarks"
+          class="remarks-value"
+        >
+          No approver remarks
+        </div>
 
     </div>
 

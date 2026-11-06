@@ -1000,10 +1000,37 @@ options +
 
 
   document
-    .getElementById('items')
-    .appendChild(d);
+  .getElementById('items')
+  .appendChild(d);
 
-}
+
+// AUTO-POPULATE ITEM CODE
+
+const itemSelect =
+  d.querySelector('.ppe-item');
+
+const itemCodeInput =
+  d.querySelector('.ppe-item-code');
+
+itemSelect.addEventListener('change', function() {
+
+  const selectedItem =
+    this.value;
+
+  const inventoryItem =
+    formData.inventory.find(function(item) {
+
+      return String(item['PPE Item']).trim() ===
+             String(selectedItem).trim();
+
+    });
+
+  itemCodeInput.value =
+    inventoryItem
+      ? inventoryItem['Item Code'] || ''
+      : '';
+
+});
 
 
 function removeItem(id) {

@@ -195,6 +195,18 @@ function loadFormData() {
 
         formData = data;
 
+        console.log(
+  'PPE INVENTORY DATA:',
+  formData.inventory
+);
+
+console.log(
+  'FIRST ITEM CODE:',
+  formData.inventory[0]
+    ? formData.inventory[0]['Item Code']
+    : 'No inventory data'
+);
+
         loadRequestors();
 
         loadEmployees();

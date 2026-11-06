@@ -11,7 +11,13 @@
 .card-title{background:#eef6f1;padding:13px 18px;font-weight:700;border-bottom:1px solid #dbe2e8}.card-body{padding:20px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 22px}.field{display:flex;flex-direction:column;gap:6px}label{font-size:13px;font-weight:700}
 input,select{width:100%;padding:10px 11px;border:1px solid #cbd5df;border-radius:6px;background:#fff;font-size:14px}input[readonly]{background:#f7f9fa}
-.item-row{display:grid;grid-template-columns:1fr 130px 42px;gap:10px;align-items:end;margin-bottom:12px}
+.item-row {
+  display: grid;
+  grid-template-columns: 1fr 150px 130px 42px;
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 12px;
+}
 .remove{height:38px;border:1px solid #e0a0a0;background:#fff5f5;color:#b42318;border-radius:6px;cursor:pointer;font-weight:bold}
 .add{margin-top:4px;padding:10px 15px;border:1px dashed #6b8f7b;background:#f4faf6;color:#0f3d2e;border-radius:6px;cursor:pointer;font-weight:700}
 .actions{display:flex;justify-content:flex-end;gap:10px;padding:18px 20px;background:#fafbfc;border-top:1px solid #e5e7eb}
@@ -44,7 +50,15 @@ input,select{width:100%;padding:10px 11px;border:1px solid #cbd5df;border-radius
 .suggestion-item:hover {
   background:#eef6f1;
 }
-@media(max-width:700px){.grid{grid-template-columns:1fr}.item-row{grid-template-columns:1fr 100px 42px}}
+@media(max-width:700px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .item-row {
+    grid-template-columns: 1fr 120px 100px 42px;
+  }
+}
 </style>
 </head>
 <body>

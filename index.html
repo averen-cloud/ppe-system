@@ -967,14 +967,24 @@ function addItem() {
       '</label>' +
 
       '<select class="ppe-item">' +
-      options +
-      '</select>' +
+options +
+'</select>' +
 
-    '</div>' +
+'</div>' +
 
-    '<div class="field">' +
+'<div class="field">' +
 
-      '<label>Quantity</label>' +
+  '<label>Item Code</label>' +
+
+  '<input class="ppe-item-code" ' +
+  'type="text" readonly ' +
+  'placeholder="Auto-populated">' +
+
+'</div>' +
+
+'<div class="field">' +
+
+  '<label>Quantity</label>' +
 
       '<input class="ppe-qty" ' +
       'type="number" min="1" step="1" ' +
